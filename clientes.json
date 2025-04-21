@@ -15,9 +15,28 @@
         []
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "indescriptible",
+        "nuevacontrase\u00f1awaos",
         "Fernando",
-        []
+        [
+            [
+                1,
+                {
+                    "nombre": "Sobre epico",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 4,
+                        "dia": 20,
+                        "hora": 20,
+                        "minuto": 22
+                    },
+                    "precio": 4000,
+                    "pago": true,
+                    "envio": true,
+                    "recib": false,
+                    "dev": false
+                }
+            ]
+        ]
     ],
     "thamar.contreras@ug.uchile.cl": [
         "nosoycreativa",
