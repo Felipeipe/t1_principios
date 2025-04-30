@@ -21,6 +21,7 @@
             [
                 1,
                 {
+                    "tipo":"compra",
                     "nombre": "Sobre epico",
                     "fecha": {
                         "a\u00f1o": 2025,
@@ -30,8 +31,6 @@
                         "minuto": 22
                     },
                     "precio": 4000,
-                    "pago": true,
-                    "envio": true,
                     "recib": false,
                     "dev": false
                 }

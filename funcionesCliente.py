@@ -4,21 +4,15 @@ import sys
 import threading
 from datetime import datetime
 
-class compra:
-    def __init__(self, name, date, price = 0,  payStatus = False, shipStatus = False, recv = False, dev = False):
+class transaccion:
+    def __init__(self, type, name, date, price = 0, recv = False, dev = False):
+        assert type == "compra" or type == "venta"
+        self.type = type
         self.name = name
         self.date = date
         self.price = price
-        self.payStatus = payStatus
-        self.shipStatus = shipStatus
         self.recv = recv
         self.dev = dev
-
-    def changePS(self):
-        self.payStatus = not self.payStatus
-
-    def changeSS(self):
-        self.shipStatus = not self.shipStatus
 
     def changeRecv(self):
         self.recv = not self.recv
@@ -27,10 +21,22 @@ class compra:
         self.dev = not self.dev
 
     def asdict(self):
-        return {"nombre":self.name, "fecha":self.date, "precio":self.price, "pago":self.payStatus, "envio":self.shipStatus, "recib":self.recv, "dev":self.dev}
+        if self.type == "compra":
+            return {"tipo":self.type, "nombre":self.name, "fecha":self.date, "precio":self.price, "recib":self.recv, "dev":self.dev}
+        else:
+            return {"tipo":self.type, "nombre":self.name, "fecha":self.date, "precio":self.price}
 
 def datetoDict(date):
-    return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute}
+    return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute, "segundo":date.time().second}
+
+def dicttoDate(dict):
+    return datetime.datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
+
+def logic(bool):
+    if bool:
+        return 1
+    else:
+        return 0
 
 mutex = threading.Lock() 
 
@@ -78,12 +84,10 @@ def catalogoCompra(sock, filepath1, filepath2, mail): # ver el catálogo de la t
                     sock.sendall(f"Confirme la compra de '{data1[ans][0].lower()}' por {data1[ans][1]} (1 = Confirmar - 0 = Cancelar)".encode())
                     conf = sock.recv(1024).decode()
                     if conf == "1": # si se confirma la compra...
-                        if data1[ans][2] > 0: # si hay stock...
-                            print("hasta aquí bien")                            
+                        if data1[ans][2] > 0: # si hay stock...                          
                             with open(filepath2, "r+") as file2: # se abre el archivo asociado a los clientes
-                                print("hasta aquí bien")
                                 data2 = json.load(file2)
-                                data2[mail][2].append([len(data2[mail][2]) + 1, compra(str(data1[ans][0]), datetoDict(datetime.today()), data1[ans][1], True, True).asdict()]) # se guarda la compra en el historial del cliente
+                                data2[mail][2].append([len(data2[mail][2]) + 1, transaccion("compra", str(data1[ans][0]), datetoDict(datetime.today()), data1[ans][1]).asdict()]) # se guarda la compra en el historial del cliente
                                 file2.seek(0)
                                 json.dump(data2, file2, indent = 4)
                                 file2.truncate()
@@ -113,20 +117,53 @@ def verHistorial(sock, filepath, mail):
             with open(filepath, "r") as file:
                 data = json.load(file)
                 hist = data[mail][2]
-                today = datetoDict(datetime.today())
-                n = 0
+                today = datetime.today()
+                n = 1
+                transactions = []
                 for action in hist:
-                    actDate = hist[action][1]["fecha"]
+                    actDate = dicttoDate(hist[action][1]["fecha"])
                     if today - actDate.date <= 365:
-                        sock.sendall(f"[{hist[action][0]}] {actDate}".encode())
+                        transactions.append(hist[action][1])
+                        sock.sendall(f"{n} {actDate.year}-{actDate.month}-{actDate.day}".encode())
                         n += 1
                 sock.sendall("¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
                 ans = sock.recv(1024).decode()
                 if ans == "0":
+                    sock.sendall("¿Se te ofrece algo más?".encode())
                     break
-                elif ans.isnumeric() and 0 < int(ans) < n + 1:
-                    sock.sendall("Datos adicionales:".encode())
+                elif ans.isnumeric() and 0 < int(ans) < n + 1: 
+                    sock.sendall("Datos:".encode())
+                    sock.sendall(f"Fecha - {transactions[ans - 1]["fecha"]}".encode())
+                    sock.sendall(f"Precio - {transactions[ans - 1]["precio"]}".encode())
+                    sock.sendall(f"Nombre de artículo - {transactions[ans - 1]["nombre"]}".encode())
+                    if transactions[ans - 1]["tipo"] == "compra":
+                        sock.sendall(f"El artículo ha sido pagado{logic(not transactions[ans - 1]["recib"])*" y está en camino."}{logic(transactions[ans - 1]["recib"])*", su envío fue confirmado"} {logic(transactions[ans - 1]["dev"])*", y se ha tramitado su devolución."}")
+                    sock.sendall("¿Se te ofrece algo más?".encode())
+                    break
+                else:
+                    sock.sendall("Ingresa una respuesta válida.".encode())
 
+def confEnv(sock, filepath, mail):
+    while True: 
+        with mutex:
+            with open(filepath, "r+") as file:
+                data = json.load(file)
+                hist = data[mail][2]
+                today = datetime.today()
+                sock.sendall("¿Cuál de los siguientes artículos recibió? (0 = Salir)".encode())
+                n = 1
+                transactions = []
+                for action in hist:
+                    actDate = dicttoDate(hist[action][1]["fecha"])
+                    if today - actDate <= 365 and hist[action][1]["tipo"] == "compra" and hist[action][1]["recib"] == False:
+                        transactions.append(hist[action][1])
+                        sock.sendall(f"[{n}] {hist[action][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
+                        n += 1
+                ans = sock.recv(1024).decode()
+                if ans  == "0":
+                    sock.sendall("¿Se te ofrece algo más?")
+                    break
+                elif 
 
 def determinarAccion(sock, x, filepath1, filepath2, mail):
     while True:
