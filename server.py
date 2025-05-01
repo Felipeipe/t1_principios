@@ -1,6 +1,3 @@
-"""
-Servidor cookie clicker
-"""
 
 # Importamos librerias
 import socket
