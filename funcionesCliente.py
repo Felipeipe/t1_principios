@@ -228,10 +228,36 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                     else:
                         sock.sendall("Ingresa una respuesta válida.".encode())
 
+def canalChat(cliente_sock, ejecutivo_sock):
+    try:
+        cliente_sock.sendall("Conectado con un ejecutivo. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
+        ejecutivo_sock.sendall("Conectado con un cliente. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
+        
+        def redirigir(entrada, salida):
+            while True:
+                mensaje = entrada.recv(1024).decode()
+                if mensaje.lower().strip() == "::salir":
+                    salida.sendall("El otro usuario ha salido del chat.\n".encode())
+                    break
+                salida.sendall(f"{mensaje}\n".encode())
 
-def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail):
+        t1 = threading.Thread(target=redirigir, args=(cliente_sock, ejecutivo_sock))
+        t2 = threading.Thread(target=redirigir, args=(ejecutivo_sock, cliente_sock))
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+    except Exception as e:
+        print(f"[SERVIDOR] Error en el chat: {e}")
+    finally:
+        cliente_sock.close()
+        ejecutivo_sock.close()
+
+
+
+def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, connected_executives):
     while True:
-        if x.isnumeric() and 0 < int(x) < 6:
+        if x.isnumeric() and 0 < int(x) < 7:
             if x == "1":
                 cambioContraseña(sock, filepath1, mail)
                 break
@@ -247,8 +273,14 @@ def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail):
             elif x == "5":
                 tramitarDevolucion(sock, filepath1, mail)
                 break
+            elif x == "6":
+                try:
+                    sock_ejecutivo = connected_executives.pop(0)
+                except Exception as e:
+                    sock.sendall("No hay ningún ejecutivo conectado en este momento. Por favor, intente más tarde".encode())
+                canalChat(sock, sock_ejecutivo)
+                break
         else:
             sock.sendall("Ingrese una acción válida.\n".encode())
             break
-
 
