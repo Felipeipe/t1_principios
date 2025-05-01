@@ -30,7 +30,7 @@ def datetoDict(date):
     return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute, "segundo":date.time().second}
 
 def dicttoDate(dict):
-    return datetime.datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
+    return datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
 
 def logic(bool):
     if bool:
@@ -120,54 +120,118 @@ def verHistorial(sock, filepath, mail):
                 today = datetime.today()
                 n = 1
                 transactions = []
-                for action in hist:
-                    actDate = dicttoDate(hist[action][1]["fecha"])
-                    if today - actDate.date <= 365:
-                        transactions.append(hist[action][1])
-                        sock.sendall(f"{n} {actDate.year}-{actDate.month}-{actDate.day}".encode())
+                for i in range(len(hist)):
+                    actDate = dicttoDate(hist[i][1]["fecha"])
+                    if (today - actDate).days <= 365:
+                        transactions.append(hist[i][1])
+                        sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
-                sock.sendall("¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
+                sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
                 ans = sock.recv(1024).decode()
                 if ans == "0":
-                    sock.sendall("¿Se te ofrece algo más?".encode())
                     break
                 elif ans.isnumeric() and 0 < int(ans) < n + 1: 
+                    ans = int(ans)
                     sock.sendall("Datos:".encode())
-                    sock.sendall(f"Fecha - {transactions[ans - 1]["fecha"]}".encode())
+                    sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]["fecha"])}\n".encode())
                     sock.sendall(f"Precio - {transactions[ans - 1]["precio"]}".encode())
-                    sock.sendall(f"Nombre de artículo - {transactions[ans - 1]["nombre"]}".encode())
+                    sock.sendall(f"\nNombre de artículo - {transactions[ans - 1]["nombre"]}".encode())
                     if transactions[ans - 1]["tipo"] == "compra":
-                        sock.sendall(f"El artículo ha sido pagado{logic(not transactions[ans - 1]["recib"])*" y está en camino."}{logic(transactions[ans - 1]["recib"])*", su envío fue confirmado"} {logic(transactions[ans - 1]["dev"])*", y se ha tramitado su devolución."}")
-                    sock.sendall("¿Se te ofrece algo más?".encode())
+                        sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]["recib"])*" y está en camino."}{logic(transactions[ans - 1]["recib"])*", su envío fue confirmado"} {logic(transactions[ans - 1]["dev"])*", y se ha tramitado su devolución."}\n".encode())
                     break
                 else:
                     sock.sendall("Ingresa una respuesta válida.".encode())
 
-def confEnv(sock, filepath, mail):
+def confirmarEnvio(sock, filepath, mail):
     while True: 
         with mutex:
             with open(filepath, "r+") as file:
                 data = json.load(file)
                 hist = data[mail][2]
                 today = datetime.today()
-                sock.sendall("¿Cuál de los siguientes artículos recibió? (0 = Salir)".encode())
-                n = 1
                 transactions = []
-                for action in hist:
-                    actDate = dicttoDate(hist[action][1]["fecha"])
-                    if today - actDate <= 365 and hist[action][1]["tipo"] == "compra" and hist[action][1]["recib"] == False:
-                        transactions.append(hist[action][1])
-                        sock.sendall(f"[{n}] {hist[action][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
+                n = 1
+                for i in range(len(hist)):
+                    actDate = dicttoDate(hist[i][1]["fecha"])
+                    if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == False:
+                        transactions.append(hist[i][1])
+                        sock.sendall(f"[{n}] {hist[i][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
-                ans = sock.recv(1024).decode()
-                if ans  == "0":
-                    sock.sendall("¿Se te ofrece algo más?")
+                if transactions == []:
+                    sock.sendall("No hay transacciones que requieran confirmar envío.".encode())
                     break
-                elif 
+                else:
+                    sock.sendall("\n¿Cual de los artículos anteriores recibiste? (0 = Salir)".encode())
+                    ans = sock.recv(1024).decode()
+                    if ans  == "0":
+                        break
+                    elif ans.isnumeric() and 0 < int(ans) < n + 1:
+                        ans = int(ans)
+                        sock.sendall(f"¿Deseas confirmar que el envío de '{hist[ans - 1][1]["nombre"]}' se concretó de forma exitosa? (1 = Aceptar - 0 = Cancelar)\n".encode())
+                        resp = sock.recv(1024).decode()
+                        if resp == "0":
+                            sock.sendall("Acción cancelada.\n".encode())
+                            break
+                        elif resp == "1":
+                            data[mail][2][ans - 1][1]["recib"] = True
+                            file.seek(0)
+                            json.dump(data, file, indent = 4)
+                            file.truncate()
+                            file.close()
+                            sock.sendall("Envío confirmado con éxito!\n".encode())
+                            break
+                        else:
+                            sock.sendall("Ingresa una respuesta válida.".encode())
+                    else:
+                        sock.sendall("Ingresa una respuesta válida.".encode())
+
+def tramitarDevolucion(sock, filepath, mail):
+     while True: 
+        with mutex:
+            with open(filepath, "r+") as file:
+                data = json.load(file)
+                hist = data[mail][2]
+                today = datetime.today()
+                transactions = []
+                n = 1
+                for i in range(len(hist)):
+                    actDate = dicttoDate(hist[i][1]["fecha"])
+                    if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == True and hist[i][1]["dev"] == False:
+                        transactions.append(hist[i][1])
+                        sock.sendall(f"[{n}] {hist[i][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
+                        n += 1
+                if transactions == []:
+                    sock.sendall("No hay transacciones que requieran confirmar envío.\n".encode())
+                    break
+                else:
+                    sock.sendall("¿Cuál de los artículos siguientes deseas reembolsar? (0 = Salir)\n".encode())
+                    ans = sock.recv(1024).decode()
+                    if ans == "0":
+                        break
+                    elif ans.isnumeric() and 0 < int(ans) < n + 1:
+                        ans = int(ans)
+                        sock.sendall(f"¿Deseas confirmar tu solicitud de reembolso de {hist[ans - 1][1]["nombre"]}? (1 = Aceptar - 0 = Cancelar)".encode())
+                        resp = sock.recv(1024).decode()
+                        if resp == "0":
+                            sock.sendall("Acción cancelada.".encode())
+                            break
+                        elif resp == "1":
+                            data[mail][2][ans - 1][1]["dev"] = True
+                            file.seek(0)
+                            json.dump(data, file, indent = 4)
+                            file.truncate()
+                            file.close()
+                            sock.sendall("Solicitud de reembolso confirmada con éxito. Contáctate con un ejecutivo para más información sobre el estado de este trámite.".encode())
+                            break
+                        else:
+                            sock.sendall("Ingresa una respuesta válida.".encode())
+                    else:
+                        sock.sendall("Ingresa una respuesta válida.".encode())
+
 
 def determinarAccion(sock, x, filepath1, filepath2, mail):
     while True:
-        if x.isnumeric() and 0 < int(x) < 4:
+        if x.isnumeric() and 0 < int(x) < 6:
             if x == "1":
                 cambioContraseña(sock, filepath1, mail)
                 break
@@ -177,7 +241,14 @@ def determinarAccion(sock, x, filepath1, filepath2, mail):
             elif x == "3":
                 verHistorial(sock, filepath1, mail)
                 break
+            elif x == "4":
+                confirmarEnvio(sock, filepath1, mail)
+                break
+            elif x == "5":
+                tramitarDevolucion(sock, filepath1, mail)
+                break
         else:
             sock.sendall("Ingrese una acción válida.".encode())
+            break
 
 

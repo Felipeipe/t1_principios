@@ -15,20 +15,57 @@
         []
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "nuevacontrase\u00f1awaos",
+        "contra",
         "Fernando",
         [
             [
                 1,
                 {
-                    "tipo":"compra",
+                    "tipo": "compra",
                     "nombre": "Sobre epico",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 4,
                         "dia": 20,
                         "hora": 20,
-                        "minuto": 22
+                        "minuto": 22,
+                        "segundo": 12
+                    },
+                    "precio": 4000,
+                    "recib": true,
+                    "dev": true
+                }
+            ],
+            [
+                2,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre legendario",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 4,
+                        "dia": 30,
+                        "hora": 22,
+                        "minuto": 29,
+                        "segundo": 18
+                    },
+                    "precio": 10000,
+                    "recib": false,
+                    "dev": false
+                }
+            ],
+            [
+                3,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre epico",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 4,
+                        "dia": 30,
+                        "hora": 23,
+                        "minuto": 31,
+                        "segundo": 53
                     },
                     "precio": 4000,
                     "recib": false,
