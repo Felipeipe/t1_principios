@@ -3,7 +3,6 @@ import json
 import sys
 import threading
 from datetime import datetime
-
 class transaccion:
     def __init__(self, type, name, date, price = 0, recv = False, dev = False):
         assert type == "compra" or type == "venta"
@@ -21,6 +20,7 @@ class transaccion:
         self.dev = not self.dev
 
     def asdict(self):
+        
         if self.type == "compra":
             return {"tipo":self.type, "nombre":self.name, "fecha":self.date, "precio":self.price, "recib":self.recv, "dev":self.dev}
         else:
@@ -40,7 +40,7 @@ def logic(bool):
 
 mutex = threading.Lock() 
 
-def cambioContraseña(sock, filepath, mail): # cambiar la contraseña actual de un usuario
+def cambioContraseña(sock:socket.socket, filepath, mail): # cambiar la contraseña actual de un usuario
     while True:
         sock.sendall("Ingrese su contraseña actual: ".encode())
         act = sock.recv(1024).decode()
@@ -69,10 +69,10 @@ def cambioContraseña(sock, filepath, mail): # cambiar la contraseña actual de 
                     sock.sendall("Contraseña incorrecta, intente nuevamente.".encode()) # si la contraseña ingresada no coincide con la registrada en la base de datos
     return None
 
-def catalogoCompra(sock, filepath1, filepath2, mail): # ver el catálogo de la tienda y permitir comprar artículos (se podría agregar comprar más de una unidad por acción)
+def catalogoCompra(sock:socket.socket, filepath1, filepath2, mail): # ver el catálogo de la tienda y permitir comprar artículos (se podría agregar comprar más de una unidad por acción)
     while True:
         with mutex:
-            with open(filepath1, "r+") as file1: # se abre el archivo JSON con los artículos
+            with open(filepath1, "r+") as file1: # se abre el archivo articulos.json con los artículos
                 data1 = json.load(file1)
                 for key, value in data1.items():
                     sock.sendall(f"[{key}] {value[0]} - ${value[1]}\n".encode()) # se muestran los elementos del catálogo
@@ -111,7 +111,7 @@ def catalogoCompra(sock, filepath1, filepath2, mail): # ver el catálogo de la t
                     sock.sendall("Ingrese un artículo válido.".encode()) # se ingresa una id inválida al elegir un artículo
     return None
 
-def verHistorial(sock, filepath, mail):
+def verHistorial(sock:socket.socket, filepath, mail):
     while True:
         with mutex:
             with open(filepath, "r") as file:
@@ -142,7 +142,7 @@ def verHistorial(sock, filepath, mail):
                 else:
                     sock.sendall("Ingresa una respuesta válida.".encode())
 
-def confirmarEnvio(sock, filepath, mail):
+def confirmarEnvio(sock:socket.socket, filepath, mail):
     while True: 
         with mutex:
             with open(filepath, "r+") as file:
@@ -185,7 +185,7 @@ def confirmarEnvio(sock, filepath, mail):
                     else:
                         sock.sendall("Ingresa una respuesta válida.".encode())
 
-def tramitarDevolucion(sock, filepath, mail):
+def tramitarDevolucion(sock:socket.socket, filepath, mail):
      while True: 
         with mutex:
             with open(filepath, "r+") as file:
@@ -201,7 +201,7 @@ def tramitarDevolucion(sock, filepath, mail):
                         sock.sendall(f"[{n}] {hist[i][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
                         n += 1
                 if transactions == []:
-                    sock.sendall("No hay transacciones que requieran confirmar envío.\n".encode())
+                    sock.sendall("No hay transacciones que puedan ser reembolsadas.\n".encode())
                     break
                 else:
                     sock.sendall("¿Cuál de los artículos siguientes deseas reembolsar? (0 = Salir)\n".encode())
@@ -229,7 +229,7 @@ def tramitarDevolucion(sock, filepath, mail):
                         sock.sendall("Ingresa una respuesta válida.".encode())
 
 
-def determinarAccion(sock, x, filepath1, filepath2, mail):
+def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail):
     while True:
         if x.isnumeric() and 0 < int(x) < 6:
             if x == "1":
@@ -248,7 +248,7 @@ def determinarAccion(sock, x, filepath1, filepath2, mail):
                 tramitarDevolucion(sock, filepath1, mail)
                 break
         else:
-            sock.sendall("Ingrese una acción válida.".encode())
+            sock.sendall("Ingrese una acción válida.\n".encode())
             break
 
 

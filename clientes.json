@@ -7,7 +7,44 @@
     "bender@ug.uchile.cl": [
         "tiaturbina",
         "Bender",
-        []
+        [
+            [
+                1,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre comun",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 1,
+                        "hora": 17,
+                        "minuto": 58,
+                        "segundo": 12
+                    },
+                    "precio": 1000,
+                    "recib": false,
+                    "dev": false
+                }
+            ],
+            [
+                2,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre comun",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 1,
+                        "hora": 17,
+                        "minuto": 58,
+                        "segundo": 22
+                    },
+                    "precio": 1000,
+                    "recib": false,
+                    "dev": false
+                }
+            ]
+        ]
     ],
     "felipe.gonzalez@ug.uchile.cl": [
         "nosepuededecir",
