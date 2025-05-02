@@ -6,9 +6,10 @@ import json
 import funcionesCliente
 
 # Variables globales
-directorio_1 = "clientes.json"
-directorio_2 = "articulos.json"
-directorio_3 = "ejecutivos.json"
+path_clientes = "clientes.json"
+path_articulos = "articulos.json"
+path_ejecutivos = "ejecutivos.json"
+
 clientesEsperando= []
 ejecutivosDisponibles = []
 clientesConectados=[]
@@ -16,15 +17,16 @@ mutex = threading.Lock() # Este impone el mutex
 
 # Funcion de cliente
 def cliente(sock, addr):
+    global clientesEsperando
+    global ejecutivosDisponibles
+    global clientesConectados
     try:
-        global clientesEsperando
-        global ejecutivosDisponibles
-        global clientesConectados
+        
         sock.sendall("Para iniciar sesión, ingresa tu correo y contraseña".encode())
         while True:
             # Revisamos que usuarios disponibles tenemos
             with mutex:
-                with open(directorio_1, "r") as file:
+                with open(path_clientes, "r") as file:
                     data = json.load(file)
                     clientes = list(data.keys())
                     file.close()
@@ -35,7 +37,8 @@ def cliente(sock, addr):
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
                     sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
-                    clientesConectados.append(sock)
+                    with mutex:
+                        clientesConectados.append(sock)
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
                         ans = sock.recv(1024).decode()
@@ -45,7 +48,7 @@ def cliente(sock, addr):
                             sock.close()
                             break
                         else:
-                            funcionesCliente.determinarAccion(sock, ans, directorio_1, directorio_2, email, ejecutivosDisponibles)
+                            funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email, ejecutivosDisponibles)
                             sock.sendall("¿Se te ofrece algo más?\n".encode())
                     break
                 else:
@@ -75,8 +78,51 @@ def ejecutivo(sock,addr):
     global clientesConectados
     global clientesEsperando
 
-    ejecutivosDisponibles.append(sock)
-    print("funcion ejecutivo")
+    try:
+        sock.sendall("Para iniciar sesión, ingresa tu correo y contraseña".encode())
+        while True:
+            # Revisamos que usuarios disponibles tenemos
+            with mutex:
+                with open(path_ejecutivos, "r") as file:
+                    data = json.load(file)
+                    ejecutivos = list(data.keys())
+                    file.close()
+            sock.sendall("Ingresa tu correo: ".encode())
+            email = sock.recv(1024).decode()
+            if email in ejecutivos:
+                sock.sendall("Ingresa tu contraseña: ".encode())
+                passw = sock.recv(1024).decode()
+                if passw == data[email][0]:
+                    sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
+                    with mutex:
+                        ejecutivosDisponibles.append(sock)
+                    while True:
+                        sock.sendall("Escriba 0 para salir".encode())
+                        ans = sock.recv(1024).decode()
+                        if ans == "0":
+                            sock.sendall("Nos vemos!".encode())
+                            ejecutivosDisponibles.remove(sock)
+                            sock.close()
+                            break
+                        else:
+                            sock.sendall("¿Se te ofrece algo más?\n".encode())
+                    break
+                else:
+                    sock.sendall("Contraseña incorrecta, ingrese sus datos nuevamente.".encode())
+            else:
+                sock.sendall("Correo no reconocido, ingrese sus datos nuevamente".encode())
+    except (ConnectionResetError, ConnectionAbortedError):
+        try:
+            ejecutivosDisponibles.remove(sock)
+        except ValueError:
+            pass
+
+        print(f"[SERVIDOR] Ejecutivo {addr} se desconectó abruptamente.")
+    except Exception as e:
+        print(f"[SERVIDOR] Error inesperado con {addr}: {e}")
+    finally:
+        sock.close()
+        print(f"[SERVIDOR] Conexión a {addr} terminada.")  
 
 
 
@@ -91,10 +137,11 @@ if __name__ == "__main__":
     s.listen(20)
 
     print(f"Servidor inicializado con éxito en el puerto {puerto}.")
-
     # Se buscan clientes que quieran conectarse.
+    
     while True:
-
+    
+        
         # Se acepta la conexion de un cliente
         conn, addr = s.accept()
 
@@ -105,13 +152,20 @@ if __name__ == "__main__":
 
         # Se inicia el thread del cliente o ejecutivo
         if tipo_usuario == b"Cliente":
-            print(f"Cliente conectado desde {addr}")
             client_thread = threading.Thread(target=cliente, args=(conn, addr))
             client_thread.start()
+            print(f"Cliente conectado desde {addr}")
+            print(f"[Servidor][DEBUG]: {clientesConectados = }")
+            print(f"[Servidor][DEBUG]: {clientesEsperando = }")
+            print(f"[Servidor][DEBUG]: {ejecutivosDisponibles = }")
+
         elif tipo_usuario == b"Ejecutivo":
             print(f"Ejecutivo conectado desde {addr}")
             ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
             ejecutivo_thread.start()
+            print(f"[Servidor][DEBUG]: {clientesConectados = }")
+            print(f"[Servidor][DEBUG]: {clientesEsperando = }")
+            print(f"[Servidor][DEBUG]: {ejecutivosDisponibles = }")
         else:
             print(tipo_usuario)
             break
@@ -119,4 +173,5 @@ if __name__ == "__main__":
         if clientesEsperando and ejecutivosDisponibles:
             cliente_sock = clientesEsperando.pop(0)
             ejecutivo_sock = ejecutivosDisponibles.pop(0)
-            threading.Thread(target=funcionesCliente.canalChat, args=(cliente_sock, ejecutivo_sock)).start()   
+            chat_thread = threading.Thread(target=funcionesCliente.canalChat, args=(cliente_sock, ejecutivo_sock))
+            chat_thread.start()
