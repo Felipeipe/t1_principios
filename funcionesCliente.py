@@ -4,10 +4,10 @@ import sys
 import threading
 from datetime import datetime
 class transaccion:
-    def __init__(self, type, name, date, price = 0, recv = False, dev = False):
+    def __init__(self, type: str, product: str, date: datetime, price = 0, recv = False, dev = False):
         assert type == "compra" or type == "venta"
         self.type = type
-        self.name = name
+        self.product = product
         self.date = date
         self.price = price
         self.recv = recv
@@ -22,9 +22,9 @@ class transaccion:
     def asdict(self):
         
         if self.type == "compra":
-            return {"tipo":self.type, "nombre":self.name, "fecha":self.date, "precio":self.price, "recib":self.recv, "dev":self.dev}
+            return {"tipo":self.type, "nombre":self.product, "fecha":self.date, "precio":self.price, "recib":self.recv, "dev":self.dev}
         else:
-            return {"tipo":self.type, "nombre":self.name, "fecha":self.date, "precio":self.price}
+            return {"tipo":self.type, "nombre":self.product, "fecha":self.date, "precio":self.price}
 
 def datetoDict(date):
     return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute, "segundo":date.time().second}
@@ -32,15 +32,16 @@ def datetoDict(date):
 def dicttoDate(dict):
     return datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
 
-def logic(bool):
-    if bool:
+def logic(boolean_val):
+    if boolean_val:
         return 1
     else:
         return 0
 
 mutex = threading.Lock() 
 
-def cambioContraseña(sock:socket.socket, filepath, mail): # cambiar la contraseña actual de un usuario
+def cambioContraseña(sock:socket.socket, filepath:str, mail: str): 
+    """Cambiar la contraseña actual de un usuario"""
     while True:
         sock.sendall("Ingrese su contraseña actual: ".encode())
         act = sock.recv(1024).decode()
@@ -69,7 +70,9 @@ def cambioContraseña(sock:socket.socket, filepath, mail): # cambiar la contrase
                     sock.sendall("Contraseña incorrecta, intente nuevamente.".encode()) # si la contraseña ingresada no coincide con la registrada en la base de datos
     return None
 
-def catalogoCompra(sock:socket.socket, filepath1, filepath2, mail): # ver el catálogo de la tienda y permitir comprar artículos (se podría agregar comprar más de una unidad por acción)
+def catalogoCompra(sock:socket.socket, filepath1: str, filepath2: str, mail: str): 
+    """ver el catálogo de la tienda y permitir 
+    comprar artículos (se podría agregar comprar más de una unidad por acción)"""
     while True:
         with mutex:
             with open(filepath1, "r+") as file1: # se abre el archivo articulos.json con los artículos
@@ -227,7 +230,8 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                             sock.sendall("Ingresa una respuesta válida.".encode())
                     else:
                         sock.sendall("Ingresa una respuesta válida.".encode())
-
+# TODO: Arreglar la parte del chat, porque solamente admite un chat tipo ping pong
+# Dejé puesto eso si los nombres como cliente y ejecutivo
 def canalChat(cliente_sock, ejecutivo_sock, nombre_ejecutivo, nombre_cliente):
     try:
         cliente_sock.sendall("Conectado con un ejecutivo. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
@@ -253,9 +257,22 @@ def canalChat(cliente_sock, ejecutivo_sock, nombre_ejecutivo, nombre_cliente):
         cliente_sock.close()
         ejecutivo_sock.close()
 
+def intentarEmpate(clientesEsperando,ejecutivosDisponibles):
+    with mutex:
+        if clientesEsperando and ejecutivosDisponibles:
+            cliente_sock = clientesEsperando.pop(0)
+            ejecutivo_sock = ejecutivosDisponibles.pop(0)
+            chat_thread = threading.Thread(target=canalChat, args=(cliente_sock, ejecutivo_sock,"ejecutivo", "cliente"))
+            chat_thread.start()
+    
+def comenzarChat(sock, clientesEsperando, ejecutivosDisponibles):
+    if ejecutivosDisponibles:
+        clientesEsperando.append(sock)
+        intentarEmpate(clientesEsperando,ejecutivosDisponibles)
+    else:
+        sock.sendall("No hay ningún ejecutivo conectado en este momento. Por favor, intente más tarde".encode())
 
-
-def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, connected_executives):
+def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, clientesEsperando, ejecutivosDisponibles):
     while True:
         if x.isnumeric() and 0 < int(x) < 7:
             if x == "1":
@@ -274,11 +291,7 @@ def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, connecte
                 tramitarDevolucion(sock, filepath1, mail)
                 break
             elif x == "6":
-                try:
-                    sock_ejecutivo = connected_executives.pop(0)
-                    canalChat(sock, sock_ejecutivo)
-                except Exception as e:
-                    sock.sendall("No hay ningún ejecutivo conectado en este momento. Por favor, intente más tarde".encode())
+                comenzarChat(sock,clientesEsperando, ejecutivosDisponibles)
                 break
         else:
             sock.sendall("Ingrese una acción válida.\n".encode())

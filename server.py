@@ -48,7 +48,7 @@ def cliente(sock, addr):
                             sock.close()
                             break
                         else:
-                            funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email, ejecutivosDisponibles)
+                            funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email, clientesEsperando, ejecutivosDisponibles)
                             sock.sendall("¿Se te ofrece algo más?\n".encode())
                     break
                 else:
@@ -96,6 +96,7 @@ def ejecutivo(sock,addr):
                     sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
                         ejecutivosDisponibles.append(sock)
+                    funcionesCliente.intentarEmpate(clientesEsperando, ejecutivosDisponibles)
                     while True:
                         sock.sendall("Escriba 0 para salir".encode())
                         ans = sock.recv(1024).decode()
@@ -169,9 +170,3 @@ if __name__ == "__main__":
         else:
             print(tipo_usuario)
             break
-
-        if clientesEsperando and ejecutivosDisponibles:
-            cliente_sock = clientesEsperando.pop(0)
-            ejecutivo_sock = ejecutivosDisponibles.pop(0)
-            chat_thread = threading.Thread(target=funcionesCliente.canalChat, args=(cliente_sock, ejecutivo_sock))
-            chat_thread.start()
