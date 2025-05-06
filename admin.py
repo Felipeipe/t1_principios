@@ -20,11 +20,11 @@ PORT = 8889
 # Se crea el socket y se conecta al servidor.
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
+s.send("Ejecutivo".encode())
 print("Conectado al servidor") 
 
 reading_thread = threading.Thread(target=leer, args=(s,))
 reading_thread.start()
-s.send("Ejecutivo".encode())
 
 # Se revisa la entrada estandar y se envia lo que ingrese el usuario.
 for line in sys.stdin:

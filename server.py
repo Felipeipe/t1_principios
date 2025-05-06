@@ -4,6 +4,7 @@ import socket
 import threading
 import json
 import funcionesCliente
+import funcionesEjecutivo
 
 # Variables globales
 path_clientes = "clientes.json"
@@ -38,13 +39,14 @@ def cliente(sock, addr):
                 if passw == data[email][0]:
                     sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
-                        clientesConectados.append(sock)
+                        data = [sock, email, data[email][1]]
+                        clientesConectados.append(data)
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
                         ans = sock.recv(1024).decode()
                         if ans == "7":
                             sock.sendall("Nos vemos!".encode())
-                            clientesConectados.remove(sock)
+                            clientesConectados.remove(data)
                             sock.close()
                             break
                         else:
@@ -93,27 +95,25 @@ def ejecutivo(sock,addr):
                 sock.sendall("Ingresa tu contraseña: ".encode())
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
-                    sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
-                    with mutex:
-                        ejecutivosDisponibles.append(sock)
-                    funcionesCliente.intentarEmpate(clientesEsperando, ejecutivosDisponibles)
+                    sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} clientes en línea".encode())
                     while True:
-                        sock.sendall("Escriba 0 para salir".encode())
+                        sock.sendall("Escribe :exit: para salir".encode())
                         ans = sock.recv(1024).decode()
-                        if ans == "0":
+                        if ans == ":exit:":
                             sock.sendall("Nos vemos!".encode())
                             ejecutivosDisponibles.remove(sock)
                             sock.close()
                             break
                         else:
-                            sock.sendall("¿Se te ofrece algo más?\n".encode())
+                            funcionesEjecutivo.chat(sock)
+                            sock.sendall("Ingresa un comando.\n".encode())
                     break
                 else:
                     sock.sendall("Contraseña incorrecta, ingrese sus datos nuevamente.".encode())
             else:
                 sock.sendall("Correo no reconocido, ingrese sus datos nuevamente".encode())
     except (ConnectionResetError, ConnectionAbortedError):
-        try:
+        try: 
             ejecutivosDisponibles.remove(sock)
         except ValueError:
             pass

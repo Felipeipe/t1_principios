@@ -3,11 +3,19 @@ import json
 import sys
 import threading
 from datetime import datetime
-class transaccion:
-    def __init__(self, type: str, product: str, date: datetime, price = 0, recv = False, dev = False):
-        assert type == "compra" or type == "venta"
+
+def datetoDict(date):
+    return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute, "segundo":date.time().second}
+
+def dicttoDate(dict):
+    return datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
+
+
+class accion:
+    def __init__(self, type: str, name = "a", date = datetime.today(), price = 0, recv = False, dev = False):
+        assert type == "compra" or type == "venta" or type == "cambio" or type == "confirm" or "devo"
         self.type = type
-        self.product = product
+        self.name = name
         self.date = date
         self.price = price
         self.recv = recv
@@ -22,21 +30,30 @@ class transaccion:
     def asdict(self):
         
         if self.type == "compra":
-            return {"tipo":self.type, "nombre":self.product, "fecha":self.date, "precio":self.price, "recib":self.recv, "dev":self.dev}
+            return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date), "precio":self.price, "recib":self.recv, "dev":self.dev}
+        elif self.type == "venta":
+            return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date), "precio":self.price}
         else:
-            return {"tipo":self.type, "nombre":self.product, "fecha":self.date, "precio":self.price}
-
-def datetoDict(date):
-    return {"año":date.year, "mes":date.month, "dia":date.day, "hora":date.time().hour, "minuto":date.time().minute, "segundo":date.time().second}
-
-def dicttoDate(dict):
-    return datetime(dict["año"], dict["mes"], dict["dia"], dict["hora"], dict["minuto"], dict["segundo"])
-
+            return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date)}
+        
 def logic(boolean_val):
     if boolean_val:
         return 1
     else:
         return 0
+    
+def translate(x):
+    assert type(x) == str
+    if x == "compra":
+        return "Compra de artículo"
+    elif x == "venta":
+        return "Venta de artículo"
+    elif x == "cambio":
+        return "Cambio de contraseña"
+    elif x == "confirm":
+        return "Confirmación de envío"
+    elif x == "devo":
+        return "Reembolso de artículo"
 
 mutex = threading.Lock() 
 
@@ -56,6 +73,7 @@ def cambioContraseña(sock:socket.socket, filepath:str, mail: str):
                         newRep = sock.recv(1024).decode() # se recibe una confirmación de la contraseña nueva
                         if new == newRep: # si las contraseñas coinciden...
                             data[mail][0] = new # se setea la contraseña ingresada cómo la nueva contraseña
+                            data[mail][2].append([len(data[mail][2]) + 1, accion("cambio").asdict()]) # se guarda la acción en el historial
                             file.seek(0)
                             json.dump(data, file, indent = 4)
                             file.truncate()
@@ -90,7 +108,7 @@ def catalogoCompra(sock:socket.socket, filepath1: str, filepath2: str, mail: str
                         if data1[ans][2] > 0: # si hay stock...                          
                             with open(filepath2, "r+") as file2: # se abre el archivo asociado a los clientes
                                 data2 = json.load(file2)
-                                data2[mail][2].append([len(data2[mail][2]) + 1, transaccion("compra", str(data1[ans][0]), datetoDict(datetime.today()), data1[ans][1]).asdict()]) # se guarda la compra en el historial del cliente
+                                data2[mail][2].append([len(data2[mail][2]) + 1, accion("compra", str(data1[ans][0]), datetime.today(), data1[ans][1]).asdict()]) # se guarda la compra en el historial del cliente
                                 file2.seek(0)
                                 json.dump(data2, file2, indent = 4)
                                 file2.truncate()
@@ -125,7 +143,7 @@ def verHistorial(sock:socket.socket, filepath, mail):
                 transactions = []
                 for i in range(len(hist)):
                     actDate = dicttoDate(hist[i][1]["fecha"])
-                    if (today - actDate).days <= 365:
+                    if (today - actDate).days <= 365 and (hist[i][1]["tipo"] == "compra" or hist[i][1]["tipo"] == "venta"):
                         transactions.append(hist[i][1])
                         sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
@@ -136,9 +154,10 @@ def verHistorial(sock:socket.socket, filepath, mail):
                 elif ans.isnumeric() and 0 < int(ans) < n + 1: 
                     ans = int(ans)
                     sock.sendall("Datos:".encode())
+                    sock.sendall(f"Tipo - {translate(transactions[ans - 1]["tipo"])}".encode())                   
                     sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]["fecha"])}\n".encode())
+                    sock.sendall(f"\nArtículo - {transactions[ans - 1]["nombre"]}".encode())
                     sock.sendall(f"Precio - {transactions[ans - 1]["precio"]}".encode())
-                    sock.sendall(f"\nNombre de artículo - {transactions[ans - 1]["nombre"]}".encode())
                     if transactions[ans - 1]["tipo"] == "compra":
                         sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]["recib"])*" y está en camino."}{logic(transactions[ans - 1]["recib"])*", su envío fue confirmado"} {logic(transactions[ans - 1]["dev"])*", y se ha tramitado su devolución."}\n".encode())
                     break
@@ -157,7 +176,7 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                 for i in range(len(hist)):
                     actDate = dicttoDate(hist[i][1]["fecha"])
                     if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == False:
-                        transactions.append(hist[i][1])
+                        transactions.append(hist[i])
                         sock.sendall(f"[{n}] {hist[i][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
                 if transactions == []:
@@ -170,17 +189,19 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                         break
                     elif ans.isnumeric() and 0 < int(ans) < n + 1:
                         ans = int(ans)
-                        sock.sendall(f"¿Deseas confirmar que el envío de '{hist[ans - 1][1]["nombre"]}' se concretó de forma exitosa? (1 = Aceptar - 0 = Cancelar)\n".encode())
+                        sock.sendall(f"¿Deseas confirmar que el envío de '{transactions[ans - 1][1]["nombre"]}' se concretó de forma exitosa? (1 = Aceptar - 0 = Cancelar)\n".encode())
                         resp = sock.recv(1024).decode()
                         if resp == "0":
                             sock.sendall("Acción cancelada.\n".encode())
                             break
                         elif resp == "1":
-                            data[mail][2][ans - 1][1]["recib"] = True
+                            data[mail][2][transactions[ans - 1][0] - 1][1]["recib"] = True
+                            data[mail][2].append([len(data[mail][2]) + 1, accion("confirm", f"{transactions[ans - 1][1]["nombre"]} (Comprado el {dicttoDate(transactions[ans - 1][1]["fecha"])})").asdict()])
                             file.seek(0)
                             json.dump(data, file, indent = 4)
                             file.truncate()
                             file.close()
+                            print(f"[SERVIDOR]: Confirmación de envío '{data[mail][2][-1][1]["nombre"]}' - Cliente {data[mail][1]}")
                             sock.sendall("Envío confirmado con éxito!\n".encode())
                             break
                         else:
@@ -200,7 +221,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                 for i in range(len(hist)):
                     actDate = dicttoDate(hist[i][1]["fecha"])
                     if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == True and hist[i][1]["dev"] == False:
-                        transactions.append(hist[i][1])
+                        transactions.append(hist[i])
                         sock.sendall(f"[{n}] {hist[i][1]["nombre"]} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
                         n += 1
                 if transactions == []:
@@ -213,18 +234,20 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                         break
                     elif ans.isnumeric() and 0 < int(ans) < n + 1:
                         ans = int(ans)
-                        sock.sendall(f"¿Deseas confirmar tu solicitud de reembolso de {hist[ans - 1][1]["nombre"]}? (1 = Aceptar - 0 = Cancelar)".encode())
+                        sock.sendall(f"¿Deseas confirmar el reembolso de {transactions[ans - 1][1]["nombre"]}? (1 = Aceptar - 0 = Cancelar)".encode())
                         resp = sock.recv(1024).decode()
                         if resp == "0":
                             sock.sendall("Acción cancelada.".encode())
                             break
                         elif resp == "1":
-                            data[mail][2][ans - 1][1]["dev"] = True
+                            data[mail][2][transactions[ans - 1][0]][1]["dev"] = True
+                            data[mail][2].append([len(data[mail][2]) + 1, accion("devo", f"{transactions[ans - 1][1]["nombre"]} (Comprado el {dicttoDate(transactions[ans - 1][1]["fecha"])})").asdict()])
                             file.seek(0)
-                            json.dump(data, file, indent = 4)
+                            json.dump(data, file, indent = 4)  
                             file.truncate()
                             file.close()
-                            sock.sendall("Solicitud de reembolso confirmada con éxito. Contáctate con un ejecutivo para más información sobre el estado de este trámite.".encode())
+                            print(f"[SERVIDOR]: Reembolso '{data[mail][2][-1][1]["nombre"]}' - Cliente {data[mail][1]}")
+                            sock.sendall("Reembolso confirmado con éxito!".encode())
                             break
                         else:
                             sock.sendall("Ingresa una respuesta válida.".encode())
@@ -257,21 +280,6 @@ def canalChat(cliente_sock, ejecutivo_sock, nombre_ejecutivo, nombre_cliente):
         cliente_sock.close()
         ejecutivo_sock.close()
 
-def intentarEmpate(clientesEsperando,ejecutivosDisponibles):
-    with mutex:
-        if clientesEsperando and ejecutivosDisponibles:
-            cliente_sock = clientesEsperando.pop(0)
-            ejecutivo_sock = ejecutivosDisponibles.pop(0)
-            chat_thread = threading.Thread(target=canalChat, args=(cliente_sock, ejecutivo_sock,"ejecutivo", "cliente"))
-            chat_thread.start()
-    
-def comenzarChat(sock, clientesEsperando, ejecutivosDisponibles):
-    if ejecutivosDisponibles:
-        clientesEsperando.append(sock)
-        intentarEmpate(clientesEsperando,ejecutivosDisponibles)
-    else:
-        sock.sendall("No hay ningún ejecutivo conectado en este momento. Por favor, intente más tarde".encode())
-
 def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, clientesEsperando, ejecutivosDisponibles):
     while True:
         if x.isnumeric() and 0 < int(x) < 7:
@@ -291,7 +299,6 @@ def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, clientes
                 tramitarDevolucion(sock, filepath1, mail)
                 break
             elif x == "6":
-                comenzarChat(sock,clientesEsperando, ejecutivosDisponibles)
                 break
         else:
             sock.sendall("Ingrese una acción válida.\n".encode())

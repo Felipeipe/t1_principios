@@ -52,7 +52,7 @@
         []
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "contra",
+        "contra2",
         "Fernando",
         [
             [
@@ -87,7 +87,7 @@
                         "segundo": 18
                     },
                     "precio": 10000,
-                    "recib": false,
+                    "recib": true,
                     "dev": false
                 }
             ],
@@ -106,7 +106,85 @@
                     },
                     "precio": 4000,
                     "recib": false,
+                    "dev": true
+                }
+            ],
+            [
+                4,
+                {
+                    "tipo": "cambio",
+                    "nombre": "",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 5,
+                        "hora": 19,
+                        "minuto": 41,
+                        "segundo": 20
+                    }
+                }
+            ],
+            [
+                5,
+                {
+                    "tipo": "cambio",
+                    "nombre": "a",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 5,
+                        "hora": 20,
+                        "minuto": 8,
+                        "segundo": 15
+                    }
+                }
+            ],
+            [
+                6,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre especial",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 5,
+                        "hora": 20,
+                        "minuto": 8,
+                        "segundo": 52
+                    },
+                    "precio": 2000,
+                    "recib": false,
                     "dev": false
+                }
+            ],
+            [
+                7,
+                {
+                    "tipo": "confirm",
+                    "nombre": "Sobre legendario (Comprado el 2025-04-30 22:29:18)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 5,
+                        "hora": 20,
+                        "minuto": 8,
+                        "segundo": 15
+                    }
+                }
+            ],
+            [
+                8,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre legendario (Comprado el 2025-04-30 22:29:18)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 5,
+                        "hora": 20,
+                        "minuto": 25,
+                        "segundo": 32
+                    }
                 }
             ]
         ]
