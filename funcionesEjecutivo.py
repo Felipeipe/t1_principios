@@ -3,7 +3,6 @@ import json
 import sys
 import threading
 from datetime import datetime
-from copy import deepcopy
 import funcionesCliente
 mutex = threading.Lock()
 
@@ -50,79 +49,53 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
     with mutex:
         with open(filepathClientes, "r+") as file1:
             data1 = json.load(file1)
-        inv = data1[cliente[1]][3]
-        if articulo in inv:
-            if inv[articulo] != 0:
-                data1[cliente[1]][3][articulo] -= 1
-                data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
-                file1.seek(0)
-                json.dump(data1, file1, indent = 4)
-                file1.truncate()
-                file1.close()
-                with open(filepathInventario, "r+") as file2:
-                    data2 = json.load(file2)
-                if articulo in data2:
-                    data2[articulo] += 1
+            inv = data1[cliente[1]][3]
+            if articulo in inv:
+                if inv[articulo] != 0:
+                    data1[cliente[1]][3][articulo] -= 1
+                    data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
+                    file1.seek(0)
+                    json.dump(data1, file1, indent = 4)
+                    file1.truncate()
+                    file1.close()
+                    with open(filepathInventario, "r+") as file2:
+                        data2 = json.load(file2)
+                        if articulo in data2:
+                            data2[articulo] += 1
+                        else:
+                            data2[articulo] = 1
+                        file2.seek(0)
+                        json.dump(data2, file2, indent = 4)
+                        file2.truncate()
+                        file2.close()
+                        print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
+                        sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
+                        cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
                 else:
-                    data2[articulo] = 1
-                file2.seek(0)
-                json.dump(data2, file2, indent = 4)
-                file2.truncate()
-                file2.close()
-                print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
-                sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
-                cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
+                    sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
             else:
-                sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
-        else:
-            sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
+                sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
 
-def publish(card, price, filepathArticulos):
+def publish(card, price, catalogue):
     """ Pone una carta a la venta por el precio del catalogo
     si no se tienen registros de esa carta se debe especificar un precio
     """
     with mutex:
-        with open(filepathArticulos, "r") as file:
-            data = json.load(file)
-        for key, values in data.items():
-            if key.lower() == values[0].lower():
-                values[2] += 1 # add one to stock
-                return
-        data = insert_dict(data,[card,price,1])
+        with open(catalogue, "r") as file:
+            data:dict = json.load(file)
+            for key, values in data.items():
+                if key.lower() == values[0].lower():
+                    values[2] += 1 # add one to stock
+                    return
+            data.
+            # if card in data:
+            #     data[card][2] += 1
+            # else:
+            #     data[card] = []
+            # for key, values in data.items():
+            #     if card.lower() == key.lower():
+            #         found = True
+            # if not found:
+
+                
         
-        with open(filepathArticulos, "w") as file:
-            json.dump(data, file, indent=4)
-
-def insert_dict(d,val):
-    """inserta en la última posicion cierto valor
-    """
-    dcopy = deepcopy(d)
-    dk = max(int(x) for x in dcopy.keys())
-    nueva_clave = str(dk + 1)
-    dcopy[nueva_clave] = val 
-
-    return dcopy
-
-def command_parser(command):
-    comm = command.split()
-    instructions = comm[0]
-    if instructions == ':status:':
-        ...
-    elif instructions == ':details:':
-        ...
-    elif instructions == ':history:':
-        ...
-    elif instructions == ':operations:':
-        ...
-    elif instructions == ':catalogue:':
-        ...
-    elif instructions == ':buy':
-        ...
-    elif instructions == ':publish':
-        ...
-    elif instructions == ':disconnect:':
-        ...
-    elif instructions == ':exit:':
-        ...
-    else:
-        passs
