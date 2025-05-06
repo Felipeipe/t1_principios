@@ -50,32 +50,32 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
     with mutex:
         with open(filepathClientes, "r+") as file1:
             data1 = json.load(file1)
-        inv = data1[cliente[1]][3]
-        if articulo in inv:
-            if inv[articulo] != 0:
-                data1[cliente[1]][3][articulo] -= 1
-                data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
-                file1.seek(0)
-                json.dump(data1, file1, indent = 4)
-                file1.truncate()
-                file1.close()
-                with open(filepathInventario, "r+") as file2:
-                    data2 = json.load(file2)
-                if articulo in data2:
-                    data2[articulo] += 1
+            inv = data1[cliente[1]][3]
+            if articulo in inv:
+                if inv[articulo] != 0:
+                    data1[cliente[1]][3][articulo] -= 1
+                    data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
+                    file1.seek(0)
+                    json.dump(data1, file1, indent = 4)
+                    file1.truncate()
+                    file1.close()
+                    with open(filepathInventario, "r+") as file2:
+                        data2 = json.load(file2)
+                    if articulo in data2:
+                        data2[articulo] += 1
+                    else:
+                        data2[articulo] = 1
+                    file2.seek(0)
+                    json.dump(data2, file2, indent = 4)
+                    file2.truncate()
+                    file2.close()
+                    print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
+                    sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
+                    cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
                 else:
-                    data2[articulo] = 1
-                file2.seek(0)
-                json.dump(data2, file2, indent = 4)
-                file2.truncate()
-                file2.close()
-                print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
-                sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
-                cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
+                    sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
             else:
-                sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
-        else:
-            sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
+                sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
 
 def publish(card, price, filepathArticulos):
     """ Pone una carta a la venta por el precio del catalogo
@@ -125,4 +125,4 @@ def command_parser(command):
     elif instructions == ':exit:':
         ...
     else:
-        passs
+        pass
