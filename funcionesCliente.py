@@ -13,7 +13,7 @@ def dicttoDate(dict):
 
 class accion:
     def __init__(self, type: str, name = "a", date = datetime.today(), price = 0, recv = False, dev = False):
-        assert type == "compra" or type == "venta" or type == "cambio" or type == "confirm" or "devo"
+        assert type == "compra" or type == "venta" or type == "cambio" or type == "confirm" or type == "devo" or type == "hist"
         self.type = type
         self.name = name
         self.date = date
@@ -54,6 +54,8 @@ def translate(x):
         return "Confirmación de envío"
     elif x == "devo":
         return "Reembolso de artículo"
+    elif x == "hist":
+        return "Revisión de historial"
 
 mutex = threading.Lock() 
 
@@ -147,6 +149,7 @@ def verHistorial(sock:socket.socket, filepath, mail):
                         transactions.append(hist[i][1])
                         sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
+                data[mail][2].append([len(data[mail][2]) + 1, accion("hist").asdict()])
                 sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
                 ans = sock.recv(1024).decode()
                 if ans == "0":
@@ -197,6 +200,11 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                         elif resp == "1":
                             data[mail][2][transactions[ans - 1][0] - 1][1]["recib"] = True
                             data[mail][2].append([len(data[mail][2]) + 1, accion("confirm", f"{transactions[ans - 1][1]["nombre"]} (Comprado el {dicttoDate(transactions[ans - 1][1]["fecha"])})").asdict()])
+                            name = transactions[ans - 1][1]["nombre"]
+                            if name in data[mail][3]:
+                                data[mail][3][name] += 1
+                            else:
+                                data[mail][3][name] = 1
                             file.seek(0)
                             json.dump(data, file, indent = 4)
                             file.truncate()
@@ -240,8 +248,10 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                             sock.sendall("Acción cancelada.".encode())
                             break
                         elif resp == "1":
+                            name = transactions[ans - 1][1]["nombre"]
                             data[mail][2][transactions[ans - 1][0]][1]["dev"] = True
                             data[mail][2].append([len(data[mail][2]) + 1, accion("devo", f"{transactions[ans - 1][1]["nombre"]} (Comprado el {dicttoDate(transactions[ans - 1][1]["fecha"])})").asdict()])
+                            data[mail][3][name] -=1
                             file.seek(0)
                             json.dump(data, file, indent = 4)  
                             file.truncate()

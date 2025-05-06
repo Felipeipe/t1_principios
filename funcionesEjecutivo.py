@@ -8,12 +8,12 @@ mutex = threading.Lock()
 
 def status(sock, onlineClients, incoming):
     with mutex:
-        sock.sendall(f"Actualmente, hay {len(onlineClients)} en línea.")
+        sock.sendall(f"Actualmente, hay {len(onlineClients)} en línea.".encode())
         if incoming:
             for client in range(len(incoming)):
-                sock.sendall(f"Cliente {incoming[client]} está solicitando una conexión.")
+                sock.sendall(f"Cliente {incoming[client]} está solicitando una conexión.".encode())
         else:
-            sock.sendall("Por el momento, ningún cliente ha solicitado una conexión")
+            sock.sendall("Por el momento, ningún cliente ha solicitado una conexión".encode())
 
 def details(sock, filepath, onlineClients):
     with mutex:
@@ -22,7 +22,7 @@ def details(sock, filepath, onlineClients):
             data = json.load(file)
             for client in range(n):
                 mail = onlineClients[client][1]
-                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(data[mail][2][-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(data[mail][2][-1]["fecha"])}")
+                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(data[mail][2][-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(data[mail][2][-1]["fecha"])}".encode())
             file.close()
 
 def catalogue(sock, filepath):
@@ -30,18 +30,50 @@ def catalogue(sock, filepath):
         with open(filepath, "r") as file:
             data = json.load(file)
             for key, values in data.items():
-                sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}")
+                sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}".encode())
             file.close()
 
-def history(filepathCliente, sockCliente, mailCliente):
+def history(sockCliente, filepathClientes, mailCliente):
     with mutex:
-        with open(filepathCliente, "r") as file:
+        with open(filepathClientes, "r") as file:
             data = json.load(file)
             hist = data[mailCliente][2]
             for action in range(len(hist)):
                 if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])} - Precio de compra / venta: {hist[action][1]["precio"]}")
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])} - Precio de compra / venta: {hist[action][1]["precio"]}".encode())
                 else:
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])}")
-                    
-def 
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])}".encode())
+            file.close()
+
+def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, precio):
+    with mutex:
+        with open(filepathClientes, "r+") as file1:
+            data1 = json.load(file1)
+            inv = data1[cliente[1]][3]
+            if articulo in inv:
+                if inv[articulo] != 0:
+                    data1[cliente[1]][3][articulo] -= 1
+                    data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
+                    file1.seek(0)
+                    json.dump(data1, file1, indent = 4)
+                    file1.truncate()
+                    file1.close()
+                    with open(filepathInventario, "r+") as file2:
+                        data2 = json.load(file2)
+                        if articulo in data2:
+                            data2[articulo] += 1
+                        else:
+                            data2[articulo] = 1
+                        file2.seek(0)
+                        json.dump(data2, file2, indent = 4)
+                        file2.truncate()
+                        file2.close()
+                        print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
+                        sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
+                        cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
+                else:
+                    sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
+            else:
+                sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
+
+

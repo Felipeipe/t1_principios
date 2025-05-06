@@ -2,7 +2,8 @@
     "juanito@gmail.com": [
         "juanitateamo",
         "Juanito",
-        []
+        [],
+        {}
     ],
     "bender@ug.uchile.cl": [
         "tiaturbina",
@@ -22,7 +23,7 @@
                         "segundo": 12
                     },
                     "precio": 1000,
-                    "recib": false,
+                    "recib": true,
                     "dev": false
                 }
             ],
@@ -44,12 +45,14 @@
                     "dev": false
                 }
             ]
-        ]
+        ],
+        {"Sobre comun":1}
     ],
     "felipe.gonzalez@ug.uchile.cl": [
         "nosepuededecir",
         "Felipe",
-        []
+        [],
+        {}
     ],
     "fernando.munoz.o@ug.uchile.cl": [
         "contra2",
@@ -70,7 +73,7 @@
                     },
                     "precio": 4000,
                     "recib": true,
-                    "dev": true
+                    "dev": false
                 }
             ],
             [
@@ -87,7 +90,7 @@
                         "segundo": 18
                     },
                     "precio": 10000,
-                    "recib": true,
+                    "recib": false,
                     "dev": false
                 }
             ],
@@ -105,8 +108,8 @@
                         "segundo": 53
                     },
                     "precio": 4000,
-                    "recib": false,
-                    "dev": true
+                    "recib": true,
+                    "dev": false
                 }
             ],
             [
@@ -153,7 +156,7 @@
                         "segundo": 52
                     },
                     "precio": 2000,
-                    "recib": false,
+                    "recib": true,
                     "dev": false
                 }
             ],
@@ -187,21 +190,25 @@
                     }
                 }
             ]
-        ]
+        ],
+        {"Sobre epico":2, "Sobre especial":1}
     ],
     "thamar.contreras@ug.uchile.cl": [
         "nosoycreativa",
         "Thamar",
-        []
+        [],
+        {}
     ],
     "fernanda.borja@ug.uchile.cl": [
         "telecoesbkn",
         "Fernanda",
-        []
+        [],
+        {}
     ],
     "ariel.nunez@ug.uchile.cl": [
         "fandesistemasdigitales",
         "Ariel",
-        []
+        [],
+        {}
     ]
 }
