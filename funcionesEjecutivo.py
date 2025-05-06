@@ -76,4 +76,26 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
             else:
                 sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
 
+def publish(card, price, catalogue):
+    """ Pone una carta a la venta por el precio del catalogo
+    si no se tienen registros de esa carta se debe especificar un precio
+    """
+    with mutex:
+        with open(catalogue, "r") as file:
+            data:dict = json.load(file)
+            for key, values in data.items():
+                if key.lower() == values[0].lower():
+                    values[2] += 1 # add one to stock
+                    return
+            data.
+            # if card in data:
+            #     data[card][2] += 1
+            # else:
+            #     data[card] = []
+            # for key, values in data.items():
+            #     if card.lower() == key.lower():
+            #         found = True
+            # if not found:
 
+                
+        
