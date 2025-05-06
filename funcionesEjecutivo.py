@@ -58,17 +58,15 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
                     file1.seek(0)
                     json.dump(data1, file1, indent = 4)
                     file1.truncate()
-                    file1.close()
                     with open(filepathInventario, "r+") as file2:
                         data2 = json.load(file2)
-                    if articulo in data2:
-                        data2[articulo] += 1
-                    else:
-                        data2[articulo] = 1
-                    file2.seek(0)
-                    json.dump(data2, file2, indent = 4)
-                    file2.truncate()
-                    file2.close()
+                        if articulo in data2:
+                            data2[articulo] += 1
+                        else:
+                            data2[articulo] = 1
+                        file2.seek(0)
+                        json.dump(data2, file2, indent = 4)
+                        file2.truncate()
                     print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
                     sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
                     cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
@@ -126,3 +124,4 @@ def command_parser(command):
         ...
     else:
         pass
+
