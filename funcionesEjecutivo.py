@@ -76,26 +76,40 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
             else:
                 sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
 
-def publish(card, price, catalogue):
+def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
     """ Pone una carta a la venta por el precio del catalogo
     si no se tienen registros de esa carta se debe especificar un precio
     """
     with mutex:
-        with open(catalogue, "r") as file:
-            data:dict = json.load(file)
-            for key, values in data.items():
-                if key.lower() == values[0].lower():
-                    values[2] += 1 # add one to stock
-                    return
-            data.
-            # if card in data:
-            #     data[card][2] += 1
-            # else:
-            #     data[card] = []
-            # for key, values in data.items():
-            #     if card.lower() == key.lower():
-            #         found = True
-            # if not found:
+        with open(filepathInventario, "r+") as file1:
+            data1:dict = json.load(file1)
+            if carta in data1:
+                data1[carta] -= 1
+                file1.seek(0)
+                json.dump(data1, file1, indent = 4)
+                file1.truncate()
+                file1.close()
+            else:
+                sockEjecutivo.sendall("No hay existencias de la carta ingresada.".encode())
+            with open(filepathCatalogo, "r+") as file2:
+                data2 = json.load(file2)
+                i = 0
+                while i < len(data2):
+                    key, value = data2.items()[i]
+                    if value[0] == carta:
+                        data2[key][2] += 1 # asumimos que si la carta/sobre ya está en el catálogo, se publica por su precio previamente definido 
+                    i += 1
+                if i == len(data2) - 1: # si llegamos al final del diccionario y la carta no existe (ej: el cliente vendió una carta sola), se crea una nueva entrada en el catálogo
+                    data2[f"{len(data2) + 1}"] = [carta, precio, 1]
+                file2.seek(0)
+                json.dump(data2, file2, indent = 4)
+                file2.truncate()
+                file2.close()
+                print(f"[SERVIDOR]: Una unidad de '{carta} fue agregada al catálogo'")
+                sockEjecutivo.sendall(f"Artículo '{carta}' agregado exitosamente al catálogo.".encode())
+
+
+            
 
                 
         

@@ -265,32 +265,32 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                         sock.sendall("Ingresa una respuesta válida.".encode())
 # TODO: Arreglar la parte del chat, porque solamente admite un chat tipo ping pong
 # Dejé puesto eso si los nombres como cliente y ejecutivo
-def canalChat(cliente_sock, ejecutivo_sock, nombre_ejecutivo, nombre_cliente):
-    try:
-        cliente_sock.sendall("Conectado con un ejecutivo. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
-        ejecutivo_sock.sendall("Conectado con un cliente. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
+# def canalChat(cliente_sock, ejecutivo_sock, nombre_ejecutivo, nombre_cliente):
+#     try:
+#         cliente_sock.sendall("Conectado con un ejecutivo. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
+#         ejecutivo_sock.sendall("Conectado con un cliente. Puedes comenzar a chatear.\nEscribe '::salir' para terminar.".encode())
         
-        def redirigir(entrada, salida, tag):
-            while True:
-                mensaje = entrada.recv(1024).decode()
-                if mensaje.lower().strip() == "::salir":
-                    salida.sendall(f"{tag} ha salido del chat.\n".encode())
-                    break
-                salida.sendall(f"[{tag}]:{mensaje}\n".encode())
+#         def redirigir(entrada, salida, tag):
+#             while True:
+#                 mensaje = entrada.recv(1024).decode()
+#                 if mensaje.lower().strip() == "::salir":
+#                     salida.sendall(f"{tag} ha salido del chat.\n".encode())
+#                     break
+#                 salida.sendall(f"[{tag}]:{mensaje}\n".encode())
 
-        t1 = threading.Thread(target=redirigir, args=(cliente_sock, ejecutivo_sock, nombre_cliente))
-        t2 = threading.Thread(target=redirigir, args=(ejecutivo_sock, cliente_sock, nombre_ejecutivo))
-        t1.start()
-        t2.start()
-        t1.join()
-        t2.join()
-    except Exception as e:
-        print(f"[SERVIDOR] Error en el chat: {e}")
-    finally:
-        cliente_sock.close()
-        ejecutivo_sock.close()
+#         t1 = threading.Thread(target=redirigir, args=(cliente_sock, ejecutivo_sock, nombre_cliente))
+#         t2 = threading.Thread(target=redirigir, args=(ejecutivo_sock, cliente_sock, nombre_ejecutivo))
+#         t1.start()
+#         t2.start()
+#         t1.join()
+#         t2.join()
+#     except Exception as e:
+#         print(f"[SERVIDOR] Error en el chat: {e}")
+#     finally:
+#         cliente_sock.close()
+#         ejecutivo_sock.close()
 
-def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, clientesEsperando, ejecutivosDisponibles):
+def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail):
     while True:
         if x.isnumeric() and 0 < int(x) < 7:
             if x == "1":
@@ -307,8 +307,6 @@ def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail, clientes
                 break
             elif x == "5":
                 tramitarDevolucion(sock, filepath1, mail)
-                break
-            elif x == "6":
                 break
         else:
             sock.sendall("Ingrese una acción válida.\n".encode())
