@@ -1,6 +1,4 @@
-import socket
 import json
-import sys
 import threading
 from datetime import datetime
 import funcionesCliente
@@ -123,7 +121,17 @@ def insert_dict(d,val):
 
     return dcopy
 
-def command_parser(sockEjecutivo, command, filepathArticulos, filepathInventario, admin, onlineClients, incoming, filepathClientes, sockCliente = None, mailCliente = None, connectionStatus = False):
+def command_parser(sockEjecutivo, 
+                   command, 
+                   filepathArticulos, 
+                   filepathInventario, 
+                   admin, 
+                   onlineClients, 
+                   incoming, 
+                   filepathClientes, 
+                   sockCliente = None, 
+                   mailCliente = None, 
+                   connectionStatus = False):
     # si es comando, se llama a la función correspondiente; si no, se envía cómo mensaje al cliente:
         comm = command.split()
         instructions = comm[0]
