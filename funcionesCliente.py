@@ -161,9 +161,9 @@ def verHistorial(sock:socket.socket, filepath, mail):
                     elif ans.isnumeric() and 0 < int(ans) < n + 1: 
                         ans = int(ans)
                         sock.sendall("Datos:".encode())
-                        sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}".encode())                   
+                        sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}\n".encode())                   
                         sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]['fecha'])}\n".encode())
-                        sock.sendall(f"\nArtículo - {transactions[ans - 1]['nombre']}".encode())
+                        sock.sendall(f"Artículo - {transactions[ans - 1]['nombre']}\n".encode())
                         sock.sendall(f"Precio - {transactions[ans - 1]['precio']}".encode())
                         if transactions[ans - 1]["tipo"] == "compra":
                             sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
@@ -253,7 +253,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                             break
                         elif resp == "1":
                             name = transactions[ans - 1][1]["nombre"]
-                            data[mail][2][transactions[ans - 1][0]][1]["dev"] = True
+                            data[mail][2][transactions[ans - 1][0]][1]["devo"] = True
                             data[mail][2].append([len(data[mail][2]) + 1, accion("devo", f"{transactions[ans - 1][1]['nombre']} (Comprado el {dicttoDate(transactions[ans - 1][1]['fecha'])})").asdict()])
                             data[mail][3][name] -=1
                             file.seek(0)

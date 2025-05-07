@@ -25,7 +25,7 @@ def details(sock, filepathClientes, onlineClients):
                 if len(hist) == 0:
                     sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.".encode())
                 else:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1]['fecha'])}".encode())
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1][1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1][1]['fecha'])}".encode())
             file.close()
 
 def catalogue(sock, filepath):
