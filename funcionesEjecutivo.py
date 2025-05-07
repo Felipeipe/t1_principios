@@ -12,7 +12,7 @@ def status(sock, onlineClients, incoming):
         sock.sendall(f"Actualmente, hay {len(onlineClients)} en línea.".encode())
         if incoming:
             for client in range(len(incoming)):
-                sock.sendall(f"Cliente {incoming[client]} está solicitando una conexión.".encode())
+                sock.sendall(f"Cliente {incoming[client][2]} está solicitando una conexión.".encode())
         else:
             sock.sendall("Por el momento, ningún cliente ha solicitado una conexión".encode())
 
@@ -119,11 +119,8 @@ def insert_dict(d,val):
 
     return dcopy
 
-def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathInventario,filepathClientes,mailCliente,onlineClients,incoming):
-    # verify command syntax:
-    if not(command.startswith(':') and command.endswith(':')):
-        sockEjecutivo.sendall("La sintaxis del commando no es correcta, por favor, ponga ':' al comienzo y al final del comando".encode())
-    else:
+def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathInventario,filepathClientes,mailCliente,onlineClients,incoming, admin):
+    # si es comando, se llama a la función correspondiente; si no, se envía cómo mensaje al cliente:
         comm = command.split()
         instructions = comm[0]
         if instructions == ':status:':
@@ -150,19 +147,14 @@ def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathI
                 price = 0
             else:
                 price = int(comm[2].removesuffix(':'))
-            publish(card,price,filepathArticulos)
-        elif instructions == ':disconnect:':
-            # disconnect(...)
-            ...
+            publish(sockEjecutivo, card, price, filepathArticulos, filepathInventario)
         elif instructions == ':exit:':
-            # exit(...)
-            ...
+            sockEjecutivo.sendall("Nos vemos!".encode())
+            admin.remove(sockEjecutivo)
+            sockEjecutivo.close()
+            pass
         else:
-            s = "Este comando no existe, los comandos disponibles son: \n" \
-            ":status: \n:details: \n:history: \n:operations: \n:catalogue: \n" \
-            ":buy <carta> <precio>: \n:publish<carta> <precio>: \n" \
-            ":disconnect: \n:exit:"
-            sockEjecutivo.sendall(s.encode())
+            sockCliente.sendall(f"[EJECUTIVO]: {command}".encode())
 
 
 # TODO: programar las funciones disconnect y exit

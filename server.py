@@ -10,47 +10,52 @@ import funcionesEjecutivo
 path_clientes = "clientes.json"
 path_articulos = "articulos.json"
 path_ejecutivos = "ejecutivos.json"
+path_inventario = "inventario_sinPublicar.json"
 
 clientesEsperando= []
 ejecutivosDisponibles = []
 clientesConectados=[]
 mutex = threading.Lock() # Este impone el mutex
 
-def iniciar_chat(cliente_data, ejecutivo_sock, funcionesEjecutivo, inventarioPath, clientesPath):
-    cliente_sock = cliente_data[0]
-    mail_cliente = cliente_data[1]
-    nombre_cliente = cliente_data[2]
+def iniciar_chat(cliente, sockEjecutivo, catalogoPath, inventarioPath, clientesPath):
+    global clientesEsperando
+    global ejecutivosDisponibles
+    global clientesConectados
+    sockCliente = cliente[0]
+    mailCliente = cliente[1]
+    nombreCliente = cliente[2]
+    connectEvent = cliente[3]
+    endEvent = cliente[4]
 
     def escuchar_cliente():
         while True:
             try:
-                mensaje = cliente_sock.recv(1024).decode()
+                mensaje = sockCliente.recv(1024).decode()
                 if mensaje == ":salir:":
-                    ejecutivo_sock.send(f"{nombre_cliente} ha salido del chat.".encode())
+                    sockEjecutivo.send(f"{nombreCliente} ha salido del chat.".encode())
+                    endEvent.set()
                     break
-                ejecutivo_sock.send(f"[{nombre_cliente}] {mensaje}".encode())
+                sockEjecutivo.send(f"[{nombreCliente}] {mensaje}".encode())
             except:
+                sockCliente.sendall("Redirigiendo al menú principal...".encode())
+                endEvent.set()
                 break
 
     def escuchar_ejecutivo():
         while True:
             try:
-                mensaje = ejecutivo_sock.recv(1024).decode()
-                if mensaje == ":salir:":
-                    cliente_sock.send("El ejecutivo ha salido del chat.".encode())
+                mensaje = sockEjecutivo.recv(1024).decode()
+                if mensaje == ":disconnect:":
+                    sockCliente.sendall("Sesión finalizada. Redirigiendo al menú principal...".encode())
+                    endEvent.set()
                     break
-                elif mensaje.startswith(":catalogue:"):
-                    funcionesEjecutivo.catalogue(ejecutivo_sock, inventarioPath)
-                elif mensaje.startswith(":history:"):
-                    funcionesEjecutivo.history(ejecutivo_sock, clientesPath, mail_cliente)
-                elif mensaje.startswith(":buy:"):
-                    _, articulo, precio = mensaje.split(":")
-                    funcionesEjecutivo.buy(ejecutivo_sock, inventarioPath, clientesPath, cliente_data, articulo.strip(), float(precio.strip()))
                 else:
-                    cliente_sock.send(f"[Ejecutivo] {mensaje}".encode())
+                    funcionesEjecutivo.command_parser(sockEjecutivo, sockCliente, mensaje, catalogoPath, inventarioPath, clientesPath, mailCliente, clientesConectados, clientesEsperando)
             except:
+                sockEjecutivo.sendall("Redirigiendo al menú principal...".encode())
+                endEvent.set()
                 break
-
+    connectEvent.set()
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 
@@ -77,14 +82,26 @@ def cliente(sock, addr):
                 if passw == data[email][0]:
                     sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
+
                         data = [sock, email, data[email][1]]
                         clientesConectados.append(data)
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
                         ans = sock.recv(1024).decode()
                         if ans == "6":
-                            clientesEsperando.append(data)
-                            pass
+                            connectEvent = threading.Event()
+                            endEvent = threading.Event()
+                            dataChat = data.append(connectEvent)
+                            dataChat = data.append(endEvent)
+                            clientesEsperando.append(dataChat)
+                            if connectEvent.wait(timeout = 60):
+                                sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
+                                endEvent.wait()
+                                sock.sendall("¿Se te ofrece algo más?".encode())
+                            else:
+                                sock.sendall("No hay ningún ejecutivo disponible en estos momentos. Intenta nuevamente más tarde.".encode())
+                                sock.sendall("¿Se te ofrece algo más?".encode())
+
                         elif ans == "7":
                             sock.sendall("Nos vemos!".encode())
                             clientesConectados.remove(data)
@@ -136,6 +153,7 @@ def ejecutivo(sock,addr):
                 sock.sendall("Ingresa tu contraseña: ".encode())
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
+                    ejecutivosDisponibles.append(sock)
                     sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} clientes en línea".encode())
                     while True:
                         sock.sendall("Escribe :exit: para salir".encode())
@@ -145,8 +163,12 @@ def ejecutivo(sock,addr):
                             ejecutivosDisponibles.remove(sock)
                             sock.close()
                             break
-                        elif sock == None:
-                            pass
+                        elif ans == ":connect:":
+                            if len(clientesEsperando) == 0:
+                                sock.sendall("No hay clientes esperando en estos momentos.".encode())
+                            else:
+                                cliente = clientesEsperando.pop(0)
+                                iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
                         else:
                             sock.sendall("Ingresa un comando.\n".encode())
                     break
