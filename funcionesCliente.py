@@ -161,9 +161,9 @@ def verHistorial(sock:socket.socket, filepath, mail):
                     elif ans.isnumeric() and 0 < int(ans) < n + 1: 
                         ans = int(ans)
                         sock.sendall("Datos:".encode())
-                        sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}".encode())                   
+                        sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}\n".encode())                   
                         sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]['fecha'])}\n".encode())
-                        sock.sendall(f"\nArtículo - {transactions[ans - 1]['nombre']}".encode())
+                        sock.sendall(f"Artículo - {transactions[ans - 1]['nombre']}\n".encode())
                         sock.sendall(f"Precio - {transactions[ans - 1]['precio']}".encode())
                         if transactions[ans - 1]["tipo"] == "compra":
                             sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())

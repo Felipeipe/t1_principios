@@ -84,9 +84,77 @@
                         "segundo": 33
                     }
                 }
+            ],
+            [
+                2,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre comun",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 16,
+                        "minuto": 53,
+                        "segundo": 34
+                    },
+                    "precio": 1000,
+                    "recib": true,
+                    "dev": false
+                }
+            ],
+            [
+                3,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre epico",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 16,
+                        "minuto": 56,
+                        "segundo": 6
+                    },
+                    "precio": 4000,
+                    "recib": false,
+                    "dev": true
+                }
+            ],
+            [
+                4,
+                {
+                    "tipo": "confirm",
+                    "nombre": "Sobre comun (Comprado el 2025-05-07 16:53:34)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 16,
+                        "minuto": 59,
+                        "segundo": 51
+                    }
+                }
+            ],
+            [
+                5,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre comun (Comprado el 2025-05-07 16:53:34)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 16,
+                        "minuto": 59,
+                        "segundo": 51
+                    }
+                }
             ]
         ],
-        {}
+        {
+            "Sobre comun": 0
+        }
     ],
     "fernanda.borja@ug.uchile.cl": [
         "telecoesbkn",
