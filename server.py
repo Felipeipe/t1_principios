@@ -26,7 +26,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     nombreCliente = cliente[2]
     connectEvent = cliente[3]
     endEvent = cliente[4]
-
+    connectEvent.set()
     def escuchar_cliente():
         while True:
             try:
@@ -55,7 +55,6 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 sockEjecutivo.sendall("Redirigiendo al menú principal...".encode())
                 endEvent.set()
                 break
-    connectEvent.set()
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 
@@ -97,7 +96,7 @@ def cliente(sock, addr):
                             dataChat.append(connectEvent)
                             clientesEsperando.append(dataChat)
                             print(clientesEsperando)
-                            if connectEvent.wait(timeout = 60):
+                            if connectEvent.wait(timeout = 20):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
                                 endEvent.wait()
                                 sock.sendall("¿Se te ofrece algo más?".encode())
