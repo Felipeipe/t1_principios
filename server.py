@@ -92,9 +92,11 @@ def cliente(sock, addr):
                         if ans == "6":
                             connectEvent = threading.Event()
                             endEvent = threading.Event()
-                            dataChat = data.append(connectEvent)
-                            dataChat = data.append(endEvent)
+                            dataChat = data
+                            dataChat.append(endEvent)
+                            dataChat.append(connectEvent)
                             clientesEsperando.append(dataChat)
+                            print(clientesEsperando)
                             if connectEvent.wait(timeout = 60):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
                                 endEvent.wait()

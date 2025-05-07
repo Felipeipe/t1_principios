@@ -249,7 +249,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                             break
                         elif resp == "1":
                             name = transactions[ans - 1][1]["nombre"]
-                            data[mail][2][transactions[ans - 1][0]][1]["dev"] = True
+                            data[mail][2][transactions[ans - 1][0]][1]["devo"] = True
                             data[mail][2].append([len(data[mail][2]) + 1, accion("devo", f"{transactions[ans - 1][1]['nombre']} (Comprado el {dicttoDate(transactions[ans - 1][1]['fecha'])})").asdict()])
                             data[mail][3][name] -=1
                             file.seek(0)
