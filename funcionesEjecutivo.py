@@ -27,7 +27,7 @@ def details(sock, filepathClientes, onlineClients):
                 if len(hist) == 0:
                     sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.".encode())
                 else:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(hist[-1]["fecha"])}".encode())
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1]['fecha'])}".encode())
             file.close()
 
 def catalogue(sock, filepath):
@@ -45,9 +45,9 @@ def history(sockCliente, filepathClientes, mailCliente):
             hist = data[mailCliente][2]
             for action in range(len(hist)):
                 if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])} - Precio de compra / venta: {hist[action][1]["precio"]}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}".encode())
                 else:
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}".encode())
             file.close()
 
 def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, precio):
