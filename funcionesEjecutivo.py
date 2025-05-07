@@ -4,6 +4,7 @@ import sys
 import threading
 from datetime import datetime
 import funcionesCliente
+from copy import deepcopy
 mutex = threading.Lock()
 
 def status(sock, onlineClients, incoming):
@@ -15,10 +16,10 @@ def status(sock, onlineClients, incoming):
         else:
             sock.sendall("Por el momento, ningún cliente ha solicitado una conexión".encode())
 
-def details(sock, filepath, onlineClients):
+def details(sock, filepathClientes, onlineClients):
     with mutex:
         n = len(onlineClients)
-        with open(filepath, "r") as file:
+        with open(filepathClientes, "r") as file:
             data = json.load(file)
             for client in range(n):
                 mail = onlineClients[client][1]
@@ -108,8 +109,68 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
                 print(f"[SERVIDOR]: Una unidad de '{carta} fue agregada al catálogo'")
                 sockEjecutivo.sendall(f"Artículo '{carta}' agregado exitosamente al catálogo.".encode())
 
+def insert_dict(d,val):
+    """inserta en la última posicion cierto valor
+    """
+    dcopy = deepcopy(d)
+    dk = max(int(x) for x in dcopy.keys())
+    nueva_clave = str(dk + 1)
+    dcopy[nueva_clave] = val 
 
-            
+    return dcopy
+
+def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathInventario,filepathClientes,mailCliente,onlineClients,incoming):
+    # verify command syntax:
+    if not(command.startswith(':') and command.endswith(':')):
+        sockEjecutivo.sendall("La sintaxis del commando no es correcta, por favor, ponga ':' al comienzo y al final del comando".encode())
+    else:
+        comm = command.split()
+        instructions = comm[0]
+        if instructions == ':status:':
+            status(sockEjecutivo,onlineClients,incoming)
+        elif instructions == ':details:':
+            details(sockEjecutivo,filepathClientes,onlineClients)
+        elif instructions == ':history:':
+            history(sockCliente,filepathClientes,mailCliente)
+        elif instructions == ':operations:':
+            history(sockCliente,filepathClientes,mailCliente)
+        elif instructions == ':catalogue:':
+            catalogue(sockEjecutivo,filepathArticulos)
+        elif instructions == ':buy':
+            N = len(comm)
+            if N != 3:
+                sockEjecutivo.sendall("Formato invalido. Recuerde que el formato es :buy <carta> <precio>:".encode())
+            card = comm[1]
+            price = int(comm[2].removesuffix(':'))
+            buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
+        elif instructions == ':publish':
+            N = len(comm)
+            card = comm[1]
+            if N < 3:
+                price = 0
+            else:
+                price = int(comm[2].removesuffix(':'))
+            publish(card,price,filepathArticulos)
+        elif instructions == ':disconnect:':
+            # disconnect(...)
+            ...
+        elif instructions == ':exit:':
+            # exit(...)
+            ...
+        else:
+            s = "Este comando no existe, los comandos disponibles son: \n" \
+            ":status: \n:details: \n:history: \n:operations: \n:catalogue: \n" \
+            ":buy <carta> <precio>: \n:publish<carta> <precio>: \n" \
+            ":disconnect: \n:exit:"
+            sockEjecutivo.sendall(s.encode())
+
+
+# TODO: programar las funciones disconnect y exit
+# no has visto el video del woody 
+# que está encima del auto de control remoto
+# y tiene cara de volado y le hace un dap a 
+# buzz lightyear
+# lo has visto?
 
                 
         
