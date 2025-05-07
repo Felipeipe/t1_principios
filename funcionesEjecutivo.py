@@ -23,7 +23,7 @@ def details(sock, filepathClientes, onlineClients):
             data = json.load(file)
             for client in range(n):
                 mail = onlineClients[client][1]
-                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(data[mail][2][-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(data[mail][2][-1]["fecha"])}".encode())
+                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(data[mail][2][-1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(data[mail][2][-1]['fecha'])}".encode())
             file.close()
 
 def catalogue(sock, filepath):
@@ -41,9 +41,9 @@ def history(sockCliente, filepathClientes, mailCliente):
             hist = data[mailCliente][2]
             for action in range(len(hist)):
                 if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])} - Precio de compra / venta: {hist[action][1]["precio"]}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}".encode())
                 else:
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]["tipo"])} - {hist[action][1]["nombre"]} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]["fecha"])}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}".encode())
             file.close()
 
 def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, precio):
