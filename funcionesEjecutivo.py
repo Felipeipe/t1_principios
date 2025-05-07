@@ -23,7 +23,11 @@ def details(sock, filepathClientes, onlineClients):
             data = json.load(file)
             for client in range(n):
                 mail = onlineClients[client][1]
-                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(data[mail][2][-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(data[mail][2][-1]["fecha"])}".encode())
+                hist = data[mail][2]
+                if len(hist) == 0:
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.".encode())
+                else:
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1]["tipo"])}, con fecha {funcionesCliente.dicttoDate(hist[-1]["fecha"])}".encode())
             file.close()
 
 def catalogue(sock, filepath):
@@ -119,7 +123,7 @@ def insert_dict(d,val):
 
     return dcopy
 
-def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathInventario,filepathClientes,mailCliente,onlineClients,incoming, admin):
+def command_parser(sockEjecutivo, command, filepathArticulos, filepathInventario, admin, onlineClients, incoming, filepathClientes, sockCliente = None, mailCliente = None, connectionStatus = False):
     # si es comando, se llama a la función correspondiente; si no, se envía cómo mensaje al cliente:
         comm = command.split()
         instructions = comm[0]
@@ -128,18 +132,27 @@ def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathI
         elif instructions == ':details:':
             details(sockEjecutivo,filepathClientes,onlineClients)
         elif instructions == ':history:':
-            history(sockCliente,filepathClientes,mailCliente)
+            if connectionStatus:
+                history(sockCliente,filepathClientes,mailCliente)
+            else:
+                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':operations:':
-            history(sockCliente,filepathClientes,mailCliente)
+            if connectionStatus:
+                history(sockCliente,filepathClientes,mailCliente)
+            else:
+                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':catalogue:':
             catalogue(sockEjecutivo,filepathArticulos)
         elif instructions == ':buy':
-            N = len(comm)
-            if N != 3:
-                sockEjecutivo.sendall("Formato invalido. Recuerde que el formato es :buy <carta> <precio>:".encode())
-            card = comm[1]
-            price = int(comm[2].removesuffix(':'))
-            buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
+            if connectionStatus:
+                N = len(comm)
+                if N != 3:
+                    sockEjecutivo.sendall("Formato invalido. Recuerde que el formato es :buy <carta> <precio>:".encode())
+                card = comm[1]
+                price = int(comm[2].removesuffix(':'))
+                buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
+            else:
+                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':publish':
             N = len(comm)
             card = comm[1]
@@ -154,7 +167,11 @@ def command_parser(sockEjecutivo,sockCliente,command,filepathArticulos,filepathI
             sockEjecutivo.close()
             pass
         else:
-            sockCliente.sendall(f"[EJECUTIVO]: {command}".encode())
+            if connectionStatus:
+                sockCliente.sendall(f"[EJECUTIVO]: {command}".encode())
+            else:
+                pass
+        sockEjecutivo.sendall("Ingresa un comando.".encode())
 
 
 # TODO: programar las funciones disconnect y exit

@@ -17,7 +17,7 @@ ejecutivosDisponibles = []
 clientesConectados=[]
 mutex = threading.Lock() # Este impone el mutex
 
-def iniciar_chat(cliente, sockEjecutivo, catalogoPath, inventarioPath, clientesPath):
+def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_clientes):
     global clientesEsperando
     global ejecutivosDisponibles
     global clientesConectados
@@ -50,7 +50,7 @@ def iniciar_chat(cliente, sockEjecutivo, catalogoPath, inventarioPath, clientesP
                     endEvent.set()
                     break
                 else:
-                    funcionesEjecutivo.command_parser(sockEjecutivo, sockCliente, mensaje, catalogoPath, inventarioPath, clientesPath, mailCliente, clientesConectados, clientesEsperando)
+                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes, sockCliente, mailCliente, True)
             except:
                 sockEjecutivo.sendall("Redirigiendo al menú principal...".encode())
                 endEvent.set()
@@ -85,6 +85,7 @@ def cliente(sock, addr):
 
                         data = [sock, email, data[email][1]]
                         clientesConectados.append(data)
+                        print(clientesConectados[-1][1])
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
                         ans = sock.recv(1024).decode()
@@ -108,7 +109,7 @@ def cliente(sock, addr):
                             sock.close()
                             break
                         else:
-                            funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email, clientesEsperando, ejecutivosDisponibles)
+                            funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email)
                             sock.sendall("¿Se te ofrece algo más?\n".encode())
                     break
                 else:
@@ -170,7 +171,7 @@ def ejecutivo(sock,addr):
                                 cliente = clientesEsperando.pop(0)
                                 iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
                         else:
-                            sock.sendall("Ingresa un comando.\n".encode())
+                            funcionesEjecutivo.command_parser(sock, ans, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes)
                     break
                 else:
                     sock.sendall("Contraseña incorrecta, ingrese sus datos nuevamente.".encode())

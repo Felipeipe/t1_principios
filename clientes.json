@@ -46,7 +46,9 @@
                 }
             ]
         ],
-        {"Sobre comun":1}
+        {
+            "Sobre comun": 1
+        }
     ],
     "felipe.gonzalez@ug.uchile.cl": [
         "nosepuededecir",
@@ -55,143 +57,14 @@
         {}
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "contra2",
+        "contra",
         "Fernando",
-        [
-            [
-                1,
-                {
-                    "tipo": "compra",
-                    "nombre": "Sobre epico",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 4,
-                        "dia": 20,
-                        "hora": 20,
-                        "minuto": 22,
-                        "segundo": 12
-                    },
-                    "precio": 4000,
-                    "recib": true,
-                    "dev": false
-                }
-            ],
-            [
-                2,
-                {
-                    "tipo": "compra",
-                    "nombre": "Sobre legendario",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 4,
-                        "dia": 30,
-                        "hora": 22,
-                        "minuto": 29,
-                        "segundo": 18
-                    },
-                    "precio": 10000,
-                    "recib": false,
-                    "dev": false
-                }
-            ],
-            [
-                3,
-                {
-                    "tipo": "compra",
-                    "nombre": "Sobre epico",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 4,
-                        "dia": 30,
-                        "hora": 23,
-                        "minuto": 31,
-                        "segundo": 53
-                    },
-                    "precio": 4000,
-                    "recib": true,
-                    "dev": false
-                }
-            ],
-            [
-                4,
-                {
-                    "tipo": "cambio",
-                    "nombre": "",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 5,
-                        "hora": 19,
-                        "minuto": 41,
-                        "segundo": 20
-                    }
-                }
-            ],
-            [
-                5,
-                {
-                    "tipo": "cambio",
-                    "nombre": "a",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 5,
-                        "hora": 20,
-                        "minuto": 8,
-                        "segundo": 15
-                    }
-                }
-            ],
-            [
-                6,
-                {
-                    "tipo": "compra",
-                    "nombre": "Sobre especial",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 5,
-                        "hora": 20,
-                        "minuto": 8,
-                        "segundo": 52
-                    },
-                    "precio": 2000,
-                    "recib": true,
-                    "dev": false
-                }
-            ],
-            [
-                7,
-                {
-                    "tipo": "confirm",
-                    "nombre": "Sobre legendario (Comprado el 2025-04-30 22:29:18)",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 5,
-                        "hora": 20,
-                        "minuto": 8,
-                        "segundo": 15
-                    }
-                }
-            ],
-            [
-                8,
-                {
-                    "tipo": "devo",
-                    "nombre": "Sobre legendario (Comprado el 2025-04-30 22:29:18)",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 5,
-                        "hora": 20,
-                        "minuto": 25,
-                        "segundo": 32
-                    }
-                }
-            ]
-        ],
-        {"Sobre epico":2, "Sobre especial":1}
+        [],
+        {
+            "Sobre epico": 2,
+            "Sobre especial": 1,
+            "Sobre legendario": 1
+        }
     ],
     "thamar.contreras@ug.uchile.cl": [
         "nosoycreativa",
