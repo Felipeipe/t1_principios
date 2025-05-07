@@ -143,29 +143,33 @@ def verHistorial(sock:socket.socket, filepath, mail):
                 today = datetime.today()
                 n = 1
                 transactions = []
-                for i in range(len(hist)):
-                    actDate = dicttoDate(hist[i][1]["fecha"])
-                    if (today - actDate).days <= 365 and (hist[i][1]["tipo"] == "compra" or hist[i][1]["tipo"] == "venta"):
-                        transactions.append(hist[i][1])
-                        sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
-                        n += 1
-                data[mail][2].append([len(data[mail][2]) + 1, accion("hist").asdict()])
-                sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
-                ans = sock.recv(1024).decode()
-                if ans == "0":
-                    break
-                elif ans.isnumeric() and 0 < int(ans) < n + 1: 
-                    ans = int(ans)
-                    sock.sendall("Datos:".encode())
-                    sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}".encode())                   
-                    sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]['fecha'])}\n".encode())
-                    sock.sendall(f"\nArtículo - {transactions[ans - 1]['nombre']}".encode())
-                    sock.sendall(f"Precio - {transactions[ans - 1]['precio']}".encode())
-                    if transactions[ans - 1]["tipo"] == "compra":
-                        sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
+                if len(hist) < 1:
+                    sock.sendall("Usted no ha realizado transacciones.".encode())
                     break
                 else:
-                    sock.sendall("Ingresa una respuesta válida.".encode())
+                    for i in range(len(hist)):
+                        actDate = dicttoDate(hist[i][1]["fecha"])
+                        if (today - actDate).days <= 365 and (hist[i][1]["tipo"] == "compra" or hist[i][1]["tipo"] == "venta"):
+                            transactions.append(hist[i][1])
+                            sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
+                            n += 1
+                    data[mail][2].append([len(data[mail][2]) + 1, accion("hist").asdict()])
+                    sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
+                    ans = sock.recv(1024).decode()
+                    if ans == "0":
+                        break
+                    elif ans.isnumeric() and 0 < int(ans) < n + 1: 
+                        ans = int(ans)
+                        sock.sendall("Datos:".encode())
+                        sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}".encode())                   
+                        sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]['fecha'])}\n".encode())
+                        sock.sendall(f"\nArtículo - {transactions[ans - 1]['nombre']}".encode())
+                        sock.sendall(f"Precio - {transactions[ans - 1]['precio']}".encode())
+                        if transactions[ans - 1]["tipo"] == "compra":
+                            sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
+                        break
+                    else:
+                        sock.sendall("Ingresa una respuesta válida.".encode())
 
 def confirmarEnvio(sock:socket.socket, filepath, mail):
     while True: 
