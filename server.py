@@ -17,69 +17,51 @@ ejecutivosDisponibles = []
 clientesConectados=[]
 mutex = threading.Lock() # Este impone el mutex
 
-def iniciar_chat(cliente, sockEjecutivo:socket.socket, path_articulos, path_inventario, path_clientes):
-    global clientesEsperando
-    global ejecutivosDisponibles
-    global clientesConectados
+def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_clientes):
+    global clientesEsperando, ejecutivosDisponibles, clientesConectados
+
     sockCliente = cliente[0]
     mailCliente = cliente[1]
     nombreCliente = cliente[2]
     connectEvent = cliente[3]
     endEvent = cliente[4]
+
     print("se llega hasta esta parte")
     connectEvent.set()
     print("se llega hasta esta parte")
+
     def escuchar_cliente():
         while not endEvent.is_set():
             try:
-                mensaje_cliente = sockCliente.recv(1024).decode()
-                mensaje_ejecutivo = sockEjecutivo.recv_nowait(1024).decode()
-
-                if mensaje_cliente == "0":
+                mensaje = sockCliente.recv(1024).decode()
+                if mensaje == "0":
                     sockEjecutivo.send(f"{nombreCliente} ha salido del chat.\n".encode())
                     endEvent.set()
                     break
-                if mensaje_ejecutivo == ':disconnect:':
-                    sockCliente.send("Ejecutivo ha salido del chat\n".encode())
-                    break
-
-                sockEjecutivo.send(f"[{nombreCliente}] {mensaje_cliente}".encode())
+                sockEjecutivo.send(f"[{nombreCliente}] {mensaje}".encode())
             except Exception as e:
-                print(f'[SERVER]: error inesperado: {e}')
-                try:
-                    sockCliente.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...\n".encode())
-                except:
-                    pass
-                finally:
-                    endEvent.set()
-                    break
+                print(f'[SERVER]: error cliente: {e}')
+                endEvent.set()
+                break
 
     def escuchar_ejecutivo():
         while not endEvent.is_set():
             try:
-                mensaje_ejecutivo = sockEjecutivo.recv(1024).decode()
-                mensaje_cliente = sockCliente.recv(1024).decode()
-                if mensaje_ejecutivo == ":disconnect:":
-                    sockCliente.sendall("Sesión finalizada. Redirigiendo al menú principal...\n".encode())
+                mensaje = sockEjecutivo.recv(1024).decode()
+                if mensaje == ":disconnect:":
+                    sockCliente.send("Ejecutivo ha salido del chat.\n".encode())
                     endEvent.set()
                     break
-                if mensaje_cliente == '0':
-                    sockEjecutivo.sendall(f"{nombreCliente} se ha desconectado. Redirigiendo al menú principal...\n".encode())
-                    break
-                else:
-                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje_ejecutivo, path_articulos, path_inventario,
-                                                    ejecutivosDisponibles, clientesConectados, clientesEsperando,
-                                                    path_clientes, sockCliente, mailCliente, True)
+                funcionesEjecutivo.command_parser(
+                    sockEjecutivo, mensaje, path_articulos, path_inventario,
+                    ejecutivosDisponibles, clientesConectados, clientesEsperando,
+                    path_clientes, sockCliente, mailCliente, True
+                )
             except Exception as e:
-                print(f'[SERVER]: error inesperado: {e}')
-                try:
-                    sockEjecutivo.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...".encode())
-                except:
-                    pass
-                finally:
-                    endEvent.set()
-                    break
-    # Espera a que alguno de los dos termine para cerrar los sockets
+                print(f'[SERVER]: error ejecutivo: {e}')
+                endEvent.set()
+                break
+
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 

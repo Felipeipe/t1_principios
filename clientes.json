@@ -88,6 +88,48 @@
                         "segundo": 35
                     }
                 }
+            ],
+            [
+                6,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 8,
+                        "hora": 17,
+                        "minuto": 28,
+                        "segundo": 15
+                    }
+                }
+            ],
+            [
+                7,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 8,
+                        "hora": 17,
+                        "minuto": 28,
+                        "segundo": 15
+                    }
+                }
+            ],
+            [
+                8,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 8,
+                        "hora": 17,
+                        "minuto": 28,
+                        "segundo": 15
+                    }
+                }
             ]
         ],
         {
