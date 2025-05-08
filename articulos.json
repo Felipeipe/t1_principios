@@ -1,1 +1,22 @@
-{"1": ["Sobre_comun", 1000, 7], "2": ["Sobre_especial", 2000, 8], "3": ["Sobre_epico", 4000, 8], "4": ["Sobre_legendario", 10000, 8]}
+{
+    "1": [
+        "Sobre_comun",
+        1000,
+        7
+    ],
+    "2": [
+        "Sobre_especial",
+        2000,
+        10
+    ],
+    "3": [
+        "Sobre_epico",
+        4000,
+        8
+    ],
+    "4": [
+        "Sobre_legendario",
+        10000,
+        8
+    ]
+}

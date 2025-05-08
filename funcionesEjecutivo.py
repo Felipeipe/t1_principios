@@ -42,10 +42,13 @@ def history(sockCliente, filepathClientes, mailCliente):
             data = json.load(file)
             hist = data[mailCliente][2]
             for action in range(len(hist)):
-                if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}\n".encode())
+                type = hist[action][1]["tipo"]
+                if type == "compra" or type == "venta":
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}\n".encode())
+                elif type == "recib" or type == "devo":
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
                 else:
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
             file.close()
 
 def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, precio):
@@ -87,7 +90,7 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
         with open(filepathInventario, "r+") as file1:
             data1:dict = json.load(file1)
             if carta in data1:
-                data1[carta] -= 1
+                data1[carta] -= 1 
                 file1.seek(0)
                 json.dump(data1, file1, indent = 4)
                 file1.truncate()
@@ -98,7 +101,7 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
                 data2 = json.load(file2)
                 i = 0
                 while i < len(data2):
-                    key, value = data2.items()[i]
+                    key, value = list(data2.items())[i]
                     if value[0] == carta:
                         data2[key][2] += 1 # asumimos que si la carta/sobre ya está en el catálogo, se publica por su precio previamente definido 
                     i += 1

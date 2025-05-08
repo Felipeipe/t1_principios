@@ -13,7 +13,7 @@ def dicttoDate(dict):
 
 class accion:
     def __init__(self, type: str, name = "a", date = datetime.today(), price = 0, recv = False, dev = False):
-        assert type == "compra" or type == "venta" or type == "cambio" or type == "confirm" or type == "devo" or type == "hist"
+        assert type == "compra" or type == "venta" or type == "cambio" or type == "confirm" or type == "devo" or type == "hist" or type == "exec"
         self.type = type
         self.name = name
         self.date = date
@@ -36,7 +36,7 @@ class accion:
         elif self.type == "confirm" or self.type == "devo":
             return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date)}
         else:
-            return {"tipo":self.type, "fecha":self.date}
+            return {"tipo":self.type, "fecha":datetoDict(self.date)}
         
 def logic(boolean_val):
     if boolean_val:
@@ -58,6 +58,8 @@ def translate(x):
         return "Reembolso de artículo"
     elif x == "hist":
         return "Revisión de historial"
+    elif x == "exec":
+        return "Conexión con ejecutivo"
 
 mutex = threading.Lock() 
 
