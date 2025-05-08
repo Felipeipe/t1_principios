@@ -14,7 +14,7 @@ def leer(sock):
     return None
 
 # Se asume que el servidor esta corriendo localmente en el puerto 8889.
-HOST = '127.0.0.1'
+HOST = '192.168.86.172'
 PORT = 8889
 
 # Se crea el socket y se conecta al servidor.

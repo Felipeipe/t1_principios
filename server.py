@@ -30,7 +30,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     connectEvent.set()
     print("se llega hasta esta parte")
     def escuchar_cliente():
-        while True:
+        while not endEvent.is_set():
             try:
                 mensaje = sockCliente.recv(1024).decode()
                 if mensaje == "0":
@@ -48,7 +48,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 break
 
     def escuchar_ejecutivo():
-        while True:
+        while not endEvent.is_set():
             try:
                 mensaje = sockEjecutivo.recv(1024).decode()
                 if mensaje == ":disconnect:":
@@ -56,15 +56,31 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                     endEvent.set()
                     break
                 else:
-                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes, sockCliente, mailCliente, True)
+                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje, path_articulos, path_inventario,
+                                                    ejecutivosDisponibles, clientesConectados, clientesEsperando,
+                                                    path_clientes, sockCliente, mailCliente, True)
             except Exception as e:
                 print(f'[SERVER]: error inesperado: {e}')
                 try:
                     sockEjecutivo.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...".encode())
                 except:
-                    pass    
+                    pass
                 endEvent.set()
                 break
+    # Espera a que alguno de los dos termine para cerrar los sockets
+    def esperar_desconexion():
+        endEvent.wait()
+        try:
+            sockCliente.close()
+        except:
+            pass
+        try:
+            sockEjecutivo.close()
+        except:
+            pass
+
+    threading.Thread(target=esperar_desconexion).start()
+
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 
