@@ -156,10 +156,11 @@ def command_parser(sockEjecutivo,
                 N = len(comm)
                 if N != 3:
                     sockEjecutivo.sendall("Formato invalido. Recuerde que el formato es :buy <carta> <precio>:".encode())
-                else:                    
+                else:
+                    cliente = [sockCliente, mailCliente]                    
                     card = comm[1]
                     price = int(comm[2].removesuffix(':'))
-                    buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
+                    buy(sockEjecutivo,filepathInventario,filepathClientes, cliente,card,price)
             else:
                 sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':publish':

@@ -47,7 +47,7 @@
             ]
         ],
         {
-            "Sobre comun": 1
+            "Sobre_comun": 1
         }
     ],
     "felipe.gonzalez@ug.uchile.cl": [
@@ -92,12 +92,28 @@
                         "segundo": 11
                     }
                 }
+            ],
+            [
+                3,
+                {
+                    "tipo": "venta",
+                    "nombre": "Sobre_especial",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 22,
+                        "minuto": 39,
+                        "segundo": 50
+                    },
+                    "precio": 1500
+                }
             ]
         ],
         {
-            "Sobre epico": 2,
-            "Sobre especial": 1,
-            "Sobre legendario": 1
+            "Sobre_epico": 2,
+            "Sobre_especial": 0,
+            "Sobre_legendario": 1
         }
     ],
     "thamar.contreras@ug.uchile.cl": [
@@ -134,7 +150,7 @@
                     },
                     "precio": 1000,
                     "recib": true,
-                    "dev": false
+                    "devo": true
                 }
             ],
             [
@@ -151,8 +167,8 @@
                         "segundo": 6
                     },
                     "precio": 4000,
-                    "recib": false,
-                    "dev": true
+                    "recib": true,
+                    "devo": false
                 }
             ],
             [
@@ -205,7 +221,7 @@
             ]
         ],
         {
-            "Sobre comun": 0
+            "Sobre_comun": 1
         }
     ],
     "fernanda.borja@ug.uchile.cl": [
