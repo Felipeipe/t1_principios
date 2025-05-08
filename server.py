@@ -92,9 +92,7 @@ def cliente(sock, addr):
                     with mutex:
                         clientData = [sock, email, data[email][1]]
                         clientesConectados.append(clientData)
-                        print(f"[Servidor][DEBUG]: {clientesConectados = }")
-                        print(f"[Servidor][DEBUG]: {clientesEsperando = }")
-                        print(f"[Servidor][DEBUG]: {ejecutivosDisponibles = }")
+
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
                         ans = sock.recv(1024).decode()
@@ -171,9 +169,7 @@ def ejecutivo(sock,addr):
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
                     ejecutivosDisponibles.append(sock)
-                    print(f"[Servidor][DEBUG]: {clientesConectados = }")
-                    print(f"[Servidor][DEBUG]: {clientesEsperando = }")
-                    print(f"[Servidor][DEBUG]: {ejecutivosDisponibles = }")
+                    
                     sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} cliente(s) en línea.\n".encode())
                     if len(clientesEsperando) != 0:
                         sock.sendall(f"Hay {len(clientesEsperando)} cliente(s) solicitando asistencia. Si desea conectarse con establecer una conexión con alguno, escriba el comando :connect:\n".encode())
