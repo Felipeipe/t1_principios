@@ -64,16 +64,16 @@ mutex = threading.Lock()
 def cambioContraseña(sock:socket.socket, filepath:str, mail: str): 
     """Cambiar la contraseña actual de un usuario"""
     while True:
-        sock.sendall("Ingrese su contraseña actual: ".encode())
+        sock.sendall("Ingrese su contraseña actual: \n".encode())
         act = sock.recv(1024).decode()
         with mutex:
             with open(filepath, "r+") as file: # se abre el archivo asociado a los clientes
                 data = json.load(file)
                 if act == data[mail][0]: # si la contraseña ingresada coincide con la registrada...
                     while True:
-                        sock.sendall("Ingrese su nueva contraseña: ".encode()) 
+                        sock.sendall("Ingrese su nueva contraseña: \n".encode()) 
                         new = sock.recv(1024).decode() # se recibe la contraseña nueva
-                        sock.sendall("Repita su nueva contraseña: ".encode())
+                        sock.sendall("Repita su nueva contraseña: \n".encode())
                         newRep = sock.recv(1024).decode() # se recibe una confirmación de la contraseña nueva
                         if new == newRep: # si las contraseñas coinciden...
                             data[mail][0] = new # se setea la contraseña ingresada cómo la nueva contraseña
@@ -82,14 +82,14 @@ def cambioContraseña(sock:socket.socket, filepath:str, mail: str):
                             json.dump(data, file, indent = 4)
                             file.truncate()
                             file.close()
-                            sock.sendall("Contraseña cambiada con éxito!".encode())
-                            print(f"[SERVIDOR]: Cambio de clave - Cliente {data[mail][1]}")
+                            sock.sendall("Contraseña cambiada con éxito!\n".encode())
+                            print(f"[SERVIDOR]: Cambio de clave - Cliente {data[mail][1]}\n")
                             break
                         else:
-                            sock.sendall("Las contraseñas no coinciden, intente nuevamente.".encode()) # si la nueva contraseña y su confirmación no coincide
+                            sock.sendall("Las contraseñas no coinciden, intente nuevamente.\n".encode()) # si la nueva contraseña y su confirmación no coincide
                     break
                 else:
-                    sock.sendall("Contraseña incorrecta, intente nuevamente.".encode()) # si la contraseña ingresada no coincide con la registrada en la base de datos
+                    sock.sendall("Contraseña incorrecta, intente nuevamente.\n".encode()) # si la contraseña ingresada no coincide con la registrada en la base de datos
     return None
 
 def catalogoCompra(sock:socket.socket, filepath1: str, filepath2: str, mail: str): 
@@ -101,12 +101,12 @@ def catalogoCompra(sock:socket.socket, filepath1: str, filepath2: str, mail: str
                 data1 = json.load(file1)
                 for key, value in data1.items():
                     sock.sendall(f"[{key}] {value[0].replace("_", " ")} - ${value[1]}\n".encode()) # se muestran los elementos del catálogo
-                sock.sendall("¿Desea comprar algún elemento del catálogo? Ingrese un número (0 = Salir)".encode())
+                sock.sendall("¿Desea comprar algún elemento del catálogo? Ingrese un número (0 = Salir)\n".encode())
                 ans = sock.recv(1024).decode()
                 if ans == '0': # salir del catálogo sin comprar nada
                     break
                 elif ans.isnumeric() and 0 < int(ans) < len(data1) + 1: # si el artículo es válido...
-                    sock.sendall(f"Confirme la compra de '{data1[ans][0].replace("_", " ").lower()}' por {data1[ans][1]} (1 = Confirmar - 0 = Cancelar)".encode())
+                    sock.sendall(f"Confirme la compra de '{data1[ans][0].replace("_", " ").lower()}' por {data1[ans][1]} (1 = Confirmar - 0 = Cancelar)\n".encode())
                     conf = sock.recv(1024).decode()
                     if conf == "1": # si se confirma la compra...
                         if data1[ans][2] > 0: # si hay stock...                          
@@ -122,18 +122,18 @@ def catalogoCompra(sock:socket.socket, filepath1: str, filepath2: str, mail: str
                                 json.dump(data1, file1)
                                 file1.truncate()
                                 file1.close()
-                                sock.sendall("Compra realizada con éxito!".encode())
-                                print(f"[SERVIDOR] Cliente {data2[mail][1]} ha comprado {data1[ans][0]} por {data1[ans][1]}")
+                                sock.sendall("Compra realizada con éxito!\n".encode())
+                                print(f"[SERVIDOR] Cliente {data2[mail][1]} ha comprado {data1[ans][0]} por {data1[ans][1]}\n")
                                 break
                         else:
-                            sock.sendall("No hay stock del artículo seleccionado. Lo sentimos ".encode()) # no hay stock
+                            sock.sendall("No hay stock del artículo seleccionado. Lo sentimos \n".encode()) # no hay stock
                     elif conf == "0":
-                        sock.sendall("Compra cancelada.".encode()) # no se confirma la compra del artículo
-                        sock.sendall("¿Se te ofrece algo más?".encode())
+                        sock.sendall("Compra cancelada.\n".encode()) # no se confirma la compra del artículo
+                        sock.sendall("¿Se te ofrece algo más?\n".encode())
                     else:
-                        sock.sendall("Ingrese una respuesta válida.".encode()) # se ingresa una respuesta inválida al confirmar la compra
+                        sock.sendall("Ingrese una respuesta válida.\n".encode()) # se ingresa una respuesta inválida al confirmar la compra
                 else:
-                    sock.sendall("Ingrese un artículo válido.".encode()) # se ingresa una id inválida al elegir un artículo
+                    sock.sendall("Ingrese un artículo válido.\n".encode()) # se ingresa una id inválida al elegir un artículo
     return None
 
 def verHistorial(sock:socket.socket, filepath, mail):
@@ -156,19 +156,19 @@ def verHistorial(sock:socket.socket, filepath, mail):
                             sock.sendall(f"[{n}] {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                             n += 1
                     data[mail][2].append([len(data[mail][2]) + 1, accion("hist").asdict()])
-                    sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)".encode())
+                    sock.sendall("\n¿Desea más información sobre alguna transacción? Ingrese un número (0 = Salir)\n".encode())
                     ans = sock.recv(1024).decode()
                     if ans == "0":
                         break
                     elif ans.isnumeric() and 0 < int(ans) < n + 1: 
                         ans = int(ans)
-                        sock.sendall("Datos:".encode())
+                        sock.sendall("Datos:\n".encode())
                         sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}\n".encode())                   
                         sock.sendall(f"Fecha - {dicttoDate(transactions[ans - 1]['fecha'])}\n".encode())
                         sock.sendall(f"Artículo - {transactions[ans - 1]['nombre'].replace("_", " ")}\n".encode())
-                        sock.sendall(f"Precio - {transactions[ans - 1]['precio']}".encode())
+                        sock.sendall(f"Precio - {transactions[ans - 1]['precio']}\n".encode())
                         if transactions[ans - 1]["tipo"] == "compra":
-                            sock.sendall(f"\nEl artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
+                            sock.sendall(f"El artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
                         break
                     else:
                         sock.sendall("Ingresa una respuesta válida.".encode())
@@ -189,10 +189,10 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                         sock.sendall(f"[{n}] {hist[i][1]['nombre'].replace("_", " ")} | {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
                 if transactions == []:
-                    sock.sendall("No hay transacciones que requieran confirmar envío.".encode())
+                    sock.sendall("No hay transacciones que requieran confirmar envío.\n".encode())
                     break
                 else:
-                    sock.sendall("\n¿Cual de los artículos anteriores recibiste? (0 = Salir)".encode())
+                    sock.sendall("\n¿Cual de los artículos anteriores recibiste? (0 = Salir)\n".encode())
                     ans = sock.recv(1024).decode()
                     if ans  == "0":
                         break
@@ -215,13 +215,13 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                             json.dump(data, file, indent = 4)
                             file.truncate()
                             file.close()
-                            print(f"[SERVIDOR]: Confirmación de envío '{data[mail][2][-1][1]['nombre']}' - Cliente {data[mail][1]}")
+                            print(f"[SERVIDOR]: Confirmación de envío '{data[mail][2][-1][1]['nombre']}' - Cliente {data[mail][1]}\n")
                             sock.sendall("Envío confirmado con éxito!\n".encode())
                             break
                         else:
-                            sock.sendall("Ingresa una respuesta válida.".encode())
+                            sock.sendall("Ingresa una respuesta válida.\n".encode())
                     else:
-                        sock.sendall("Ingresa una respuesta válida.".encode())
+                        sock.sendall("Ingresa una respuesta válida.\n".encode())
 
 def tramitarDevolucion(sock:socket.socket, filepath, mail):
      while True: 
@@ -236,7 +236,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                     actDate = dicttoDate(hist[i][1]["fecha"])
                     if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == True and hist[i][1]["dev"] == False:
                         transactions.append(hist[i])
-                        sock.sendall(f"[{n}] {hist[i][1]['nombre'].replace("_", " ")} | {actDate.year}-{actDate.month}-{actDate.day}".encode())
+                        sock.sendall(f"[{n}] {hist[i][1]['nombre'].replace("_", " ")} | {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1
                 if transactions == []:
                     sock.sendall("No hay transacciones que puedan ser reembolsadas.\n".encode())
@@ -248,10 +248,10 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                         break
                     elif ans.isnumeric() and 0 < int(ans) < n + 1:
                         ans = int(ans)
-                        sock.sendall(f"¿Deseas confirmar el reembolso de {transactions[ans - 1][1]['nombre'].replace("_", " ")}? (1 = Aceptar - 0 = Cancelar)".encode())
+                        sock.sendall(f"¿Deseas confirmar el reembolso de {transactions[ans - 1][1]['nombre'].replace("_", " ")}? (1 = Aceptar - 0 = Cancelar)\n".encode())
                         resp = sock.recv(1024).decode()
                         if resp == "0":
-                            sock.sendall("Acción cancelada.".encode())
+                            sock.sendall("Acción cancelada.\n".encode())
                             break
                         elif resp == "1":
                             name = transactions[ans - 1][1]["nombre"]
@@ -263,12 +263,12 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                             file.truncate()
                             file.close()
                             print(f"[SERVIDOR]: Reembolso '{data[mail][2][-1][1]['nombre']}' - Cliente {data[mail][1]}")
-                            sock.sendall("Reembolso confirmado con éxito!".encode())
+                            sock.sendall("Reembolso confirmado con éxito!\n".encode())
                             break
                         else:
-                            sock.sendall("Ingresa una respuesta válida.".encode())
+                            sock.sendall("Ingresa una respuesta válida.\n".encode())
                     else:
-                        sock.sendall("Ingresa una respuesta válida.".encode())
+                        sock.sendall("Ingresa una respuesta válida.\n".encode())
 
 
 def determinarAccion(sock:socket.socket, x, filepath1, filepath2, mail):
