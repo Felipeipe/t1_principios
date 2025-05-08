@@ -24,7 +24,7 @@
                     },
                     "precio": 1000,
                     "recib": true,
-                    "dev": false
+                    "devo": false
                 }
             ],
             [
@@ -42,7 +42,7 @@
                     },
                     "precio": 1000,
                     "recib": false,
-                    "dev": false
+                    "devo": false
                 }
             ]
         ],

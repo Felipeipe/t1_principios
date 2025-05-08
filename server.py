@@ -26,7 +26,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     nombreCliente = cliente[2]
     connectEvent = cliente[3]
     endEvent = cliente[4]
-
+    connectEvent.set()
     def escuchar_cliente():
         while True:
             try:
@@ -55,7 +55,6 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 sockEjecutivo.sendall("Redirigiendo al menú principal...".encode())
                 endEvent.set()
                 break
-    connectEvent.set()
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 
@@ -92,10 +91,12 @@ def cliente(sock, addr):
                         if ans == "6":
                             connectEvent = threading.Event()
                             endEvent = threading.Event()
-                            dataChat = data.append(connectEvent)
-                            dataChat = data.append(endEvent)
+                            dataChat = data
+                            dataChat.append(endEvent)
+                            dataChat.append(connectEvent)
                             clientesEsperando.append(dataChat)
-                            if connectEvent.wait(timeout = 60):
+                            print(clientesEsperando)
+                            if connectEvent.wait(timeout = 20):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
                                 endEvent.wait()
                                 sock.sendall("¿Se te ofrece algo más?".encode())
@@ -155,9 +156,13 @@ def ejecutivo(sock,addr):
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
                     ejecutivosDisponibles.append(sock)
-                    sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} clientes en línea".encode())
+                    sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} clientes en línea\n".encode())
+                    if len(clientesConectados) != 0:
+                        sock.sendall("Si desea conectarse con el cliente, escriba el comando :connect:\n".encode())
+                    else:
+                        sock.sendall("Si desea ver los clientes esperando asistencia, debe escribir :status:\n".encode())
                     while True:
-                        sock.sendall("Escribe :exit: para salir".encode())
+                        sock.sendall("Escribe :exit: para salir\n".encode())
                         ans = sock.recv(1024).decode()
                         if ans == ":exit:":
                             sock.sendall("Nos vemos!".encode())
@@ -166,7 +171,7 @@ def ejecutivo(sock,addr):
                             break
                         elif ans == ":connect:":
                             if len(clientesEsperando) == 0:
-                                sock.sendall("No hay clientes esperando en estos momentos.".encode())
+                                sock.sendall("No hay clientes esperando en estos momentos.\n".encode())
                             else:
                                 cliente = clientesEsperando.pop(0)
                                 iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
