@@ -23,7 +23,6 @@ s.connect((HOST, PORT))
 s.send("Cliente".encode())
 print("Conectado al servidor") 
 
-
 reading_thread = threading.Thread(target=leer, args=(s,))
 reading_thread.start()
 

@@ -43,7 +43,7 @@ def history(sockCliente, filepathClientes, mailCliente):
             hist = data[mailCliente][2]
             for action in range(len(hist)):
                 if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}".encode())
                 else:
                     sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}".encode())
             file.close()
@@ -56,7 +56,7 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
             if articulo in inv:
                 if inv[articulo] != 0:
                     data1[cliente[1]][3][articulo] -= 1
-                    data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio)])
+                    data1[cliente[1]][2].append([len(data1[cliente[1]][2]) + 1, funcionesCliente.accion("venta", articulo, datetime.today(), precio).asdict()])
                     file1.seek(0)
                     json.dump(data1, file1, indent = 4)
                     file1.truncate()
@@ -102,7 +102,7 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
                     if value[0] == carta:
                         data2[key][2] += 1 # asumimos que si la carta/sobre ya está en el catálogo, se publica por su precio previamente definido 
                     i += 1
-                if i == len(data2) - 1: # si llegamos al final del diccionario y la carta no existe (ej: el cliente vendió una carta sola), se crea una nueva entrada en el catálogo
+                if i == len(data2) - 1: # si llegamos al final del diccionario y la carta/sobre no existe, se crea una nueva entrada en el catálogo
                     data2[f"{len(data2) + 1}"] = [carta, precio, 1]
                 file2.seek(0)
                 json.dump(data2, file2, indent = 4)
@@ -143,7 +143,7 @@ def command_parser(sockEjecutivo,
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
             else:
-                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':operations:':
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
@@ -156,9 +156,10 @@ def command_parser(sockEjecutivo,
                 N = len(comm)
                 if N != 3:
                     sockEjecutivo.sendall("Formato invalido. Recuerde que el formato es :buy <carta> <precio>:".encode())
-                card = comm[1]
-                price = int(comm[2].removesuffix(':'))
-                buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
+                else:                    
+                    card = comm[1]
+                    price = int(comm[2].removesuffix(':'))
+                    buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
             else:
                 sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':publish':
@@ -178,8 +179,8 @@ def command_parser(sockEjecutivo,
             if connectionStatus:
                 sockCliente.sendall(f"[EJECUTIVO]: {command}".encode())
             else:
-                pass
-        sockEjecutivo.sendall("Ingresa un comando.".encode())
+                sockEjecutivo.sendall("Ingresa un comando.".encode())
+       
 
 
 # TODO: programar las funciones disconnect y exit
