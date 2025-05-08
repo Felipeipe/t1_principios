@@ -143,12 +143,12 @@ def command_parser(sockEjecutivo,
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
             else:
-                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':operations:':
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
             else:
-                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':catalogue:':
             catalogue(sockEjecutivo,filepathArticulos)
         elif instructions == ':buy':
@@ -160,7 +160,7 @@ def command_parser(sockEjecutivo,
                 price = int(comm[2].removesuffix(':'))
                 buy(sockEjecutivo,filepathInventario,filepathClientes,sockCliente,card,price)
             else:
-                sockEjecutivo("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
         elif instructions == ':publish':
             N = len(comm)
             card = comm[1]
