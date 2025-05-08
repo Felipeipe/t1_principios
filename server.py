@@ -97,14 +97,15 @@ def cliente(sock, addr):
                             endEvent = threading.Event()
                             dataChat = [sock, email, data[email][1], connectEvent, endEvent]
                             clientesEsperando.append(dataChat)
+                            sock.sendall("Esperando a que se conecte un ejecutivo...\n".encode())
                             if connectEvent.wait(timeout = 20):
-                                sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
+                                sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...\n".encode())
                                 endEvent.wait()
-                                sock.sendall("¿Se te ofrece algo más?".encode())
                             else:
-                                sock.sendall("No hay ningún ejecutivo disponible en estos momentos. Intenta nuevamente más tarde.".encode())
-                                sock.sendall("¿Se te ofrece algo más?".encode())
+                                sock.sendall("No hay ningún ejecutivo disponible en estos momentos. Intenta nuevamente más tarde.\n".encode())
 
+                            sock.sendall("¿Se te ofrece algo más?".encode())
+                            clientesEsperando.remove(dataChat)
                         elif ans == "7":
                             
                             sock.sendall("Nos vemos!".encode())
@@ -177,6 +178,7 @@ def ejecutivo(sock,addr):
                             else:
                                 cliente = clientesEsperando.pop(0)
                                 iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
+                                sock.sendall("Conexión con cliente exitosa, puede comenzar a chatear\n".encode())
                                 cliente[4].wait()
                         else:
                             funcionesEjecutivo.command_parser(sock, ans, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes)

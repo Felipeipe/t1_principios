@@ -30,7 +30,7 @@ class accion:
     def asdict(self):
         
         if self.type == "compra":
-            return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date), "precio":self.price, "recib":self.recv, "dev":self.dev}
+            return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date), "precio":self.price, "recib":self.recv, "devo":self.dev}
         elif self.type == "venta":
             return {"tipo":self.type, "nombre":self.name, "fecha":datetoDict(self.date), "precio":self.price}
         elif self.type == "confirm" or self.type == "devo":
@@ -168,7 +168,7 @@ def verHistorial(sock:socket.socket, filepath, mail):
                         sock.sendall(f"Artículo - {transactions[ans - 1]['nombre'].replace("_", " ")}\n".encode())
                         sock.sendall(f"Precio - {transactions[ans - 1]['precio']}\n".encode())
                         if transactions[ans - 1]["tipo"] == "compra":
-                            sock.sendall(f"El artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['dev'])*', y se ha tramitado su devolución.'}\n".encode())
+                            sock.sendall(f"El artículo ha sido pagado{logic(not transactions[ans - 1]['recib'])*' y está en camino.'}{logic(transactions[ans - 1]['recib'])*', su envío fue confirmado'}{logic(transactions[ans - 1]['devo'])*', y se ha tramitado su devolución.'}\n".encode())
                         break
                     else:
                         sock.sendall("Ingresa una respuesta válida.".encode())
@@ -234,7 +234,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                 n = 1
                 for i in range(len(hist)):
                     actDate = dicttoDate(hist[i][1]["fecha"])
-                    if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == True and hist[i][1]["dev"] == False:
+                    if (today - actDate).days <= 365 and hist[i][1]["tipo"] == "compra" and hist[i][1]["recib"] == True and hist[i][1]["devo"] == False:
                         transactions.append(hist[i])
                         sock.sendall(f"[{n}] {hist[i][1]['nombre'].replace("_", " ")} | {actDate.year}-{actDate.month}-{actDate.day}\n".encode())
                         n += 1

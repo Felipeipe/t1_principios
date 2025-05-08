@@ -13,7 +13,7 @@
                 1,
                 {
                     "tipo": "compra",
-                    "nombre": "Sobre comun",
+                    "nombre": "Sobre_comun",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -31,7 +31,7 @@
                 2,
                 {
                     "tipo": "compra",
-                    "nombre": "Sobre comun",
+                    "nombre": "Sobre_comun",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -41,13 +41,43 @@
                         "segundo": 22
                     },
                     "precio": 1000,
-                    "recib": false,
-                    "devo": false
+                    "recib": true,
+                    "devo": true
+                }
+            ],
+            [
+                3,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre_comun (Comprado el 2025-05-01 17:58:12)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 8,
+                        "hora": 0,
+                        "minuto": 4,
+                        "segundo": 53
+                    }
+                }
+            ],
+            [
+                4,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre_comun (Comprado el 2025-05-01 17:58:12)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 8,
+                        "hora": 0,
+                        "minuto": 4,
+                        "segundo": 53
+                    }
                 }
             ]
         ],
         {
-            "Sobre_comun": 1
+            "Sobre_comun": 0
         }
     ],
     "felipe.gonzalez@ug.uchile.cl": [
