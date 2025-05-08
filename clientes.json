@@ -105,7 +105,7 @@
                     },
                     "precio": 2000,
                     "recib": false,
-                    "dev": false
+                    "devo": false
                 }
             ],
             [
@@ -169,7 +169,7 @@
                 2,
                 {
                     "tipo": "compra",
-                    "nombre": "Sobre comun",
+                    "nombre": "Sobre_comun",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -187,7 +187,7 @@
                 3,
                 {
                     "tipo": "compra",
-                    "nombre": "Sobre epico",
+                    "nombre": "Sobre_epico",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -205,7 +205,7 @@
                 4,
                 {
                     "tipo": "confirm",
-                    "nombre": "Sobre comun (Comprado el 2025-05-07 16:53:34)",
+                    "nombre": "Sobre_comun (Comprado el 2025-05-07 16:53:34)",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -220,7 +220,7 @@
                 5,
                 {
                     "tipo": "devo",
-                    "nombre": "Sobre comun (Comprado el 2025-05-07 16:53:34)",
+                    "nombre": "Sobre_comun (Comprado el 2025-05-07 16:53:34)",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -235,7 +235,7 @@
                 6,
                 {
                     "tipo": "compra",
-                    "nombre": "Sobre especial",
+                    "nombre": "Sobre_especial",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
@@ -246,7 +246,7 @@
                     },
                     "precio": 2000,
                     "recib": false,
-                    "dev": false
+                    "devo": false
                 }
             ]
         ],
