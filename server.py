@@ -26,7 +26,9 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     nombreCliente = cliente[2]
     connectEvent = cliente[3]
     endEvent = cliente[4]
+    print("se llega hasta esta parte")
     connectEvent.set()
+    print("se llega hasta esta parte")
     def escuchar_cliente():
         while True:
             try:
@@ -84,8 +86,8 @@ def cliente(sock, addr):
                     sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
 
-                        data = [sock, email, data[email][1]]
-                        clientesConectados.append(data)
+                        clientData = [sock, email, data[email][1]]
+                        clientesConectados.append(clientData)
                         print(clientesConectados[-1][1])
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
@@ -93,11 +95,8 @@ def cliente(sock, addr):
                         if ans == "6":
                             connectEvent = threading.Event()
                             endEvent = threading.Event()
-                            dataChat = data
-                            dataChat.append(endEvent)
-                            dataChat.append(connectEvent)
+                            dataChat = [sock, email, data[email][1], connectEvent, endEvent]
                             clientesEsperando.append(dataChat)
-                            print(clientesEsperando)
                             if connectEvent.wait(timeout = 20):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...".encode())
                                 endEvent.wait()
@@ -108,7 +107,7 @@ def cliente(sock, addr):
 
                         elif ans == "7":
                             sock.sendall("Nos vemos!".encode())
-                            clientesConectados.remove(data)
+                            clientesConectados.remove(clientData)
                             sock.close()
                             break
                         else:
@@ -121,12 +120,12 @@ def cliente(sock, addr):
                 sock.sendall("Correo no reconocido, ingrese sus datos nuevamente".encode())
     except (ConnectionResetError, ConnectionAbortedError):
         try:
-            clientesConectados.remove(sock)
+            clientesConectados.remove(clientData)
         except ValueError:
             pass
         
         try:
-            clientesEsperando.remove(sock)
+            clientesEsperando.remove(clientData)
         except ValueError:
             pass
 
@@ -177,6 +176,7 @@ def ejecutivo(sock,addr):
                             else:
                                 cliente = clientesEsperando.pop(0)
                                 iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
+                                cliente[4].wait()
                         else:
                             funcionesEjecutivo.command_parser(sock, ans, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes)
                     break

@@ -57,9 +57,43 @@
         {}
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "contra",
+        "contra1",
         "Fernando",
-        [],
+        [
+            [
+                1,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_especial",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 21,
+                        "minuto": 8,
+                        "segundo": 6
+                    },
+                    "precio": 2000,
+                    "recib": false,
+                    "dev": false
+                }
+            ],
+            [
+                2,
+                {
+                    "tipo": "cambio",
+                    "nombre": "a",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 21,
+                        "minuto": 6,
+                        "segundo": 11
+                    }
+                }
+            ]
+        ],
         {
             "Sobre epico": 2,
             "Sobre especial": 1,
