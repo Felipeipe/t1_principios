@@ -17,7 +17,7 @@ ejecutivosDisponibles = []
 clientesConectados=[]
 mutex = threading.Lock() # Este impone el mutex
 
-def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_clientes):
+def iniciar_chat(cliente, sockEjecutivo:socket.socket, path_articulos, path_inventario, path_clientes):
     global clientesEsperando
     global ejecutivosDisponibles
     global clientesConectados
@@ -32,31 +32,42 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     def escuchar_cliente():
         while not endEvent.is_set():
             try:
-                mensaje = sockCliente.recv(1024).decode()
-                if mensaje == "0":
-                    sockEjecutivo.send(f"{nombreCliente} ha salido del chat.".encode())
+                mensaje_cliente = sockCliente.recv(1024).decode()
+                mensaje_ejecutivo = sockEjecutivo.recv_nowait(1024).decode()
+
+                if mensaje_cliente == "0":
+                    sockEjecutivo.send(f"{nombreCliente} ha salido del chat.\n".encode())
                     endEvent.set()
                     break
-                sockEjecutivo.send(f"[{nombreCliente}] {mensaje}".encode())
+                if mensaje_ejecutivo == ':disconnect:':
+                    sockCliente.send("Ejecutivo ha salido del chat\n".encode())
+                    break
+
+                sockEjecutivo.send(f"[{nombreCliente}] {mensaje_cliente}".encode())
             except Exception as e:
                 print(f'[SERVER]: error inesperado: {e}')
                 try:
-                    sockCliente.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...".encode())
+                    sockCliente.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...\n".encode())
                 except:
                     pass
-                endEvent.set()
-                break
+                finally:
+                    endEvent.set()
+                    break
 
     def escuchar_ejecutivo():
         while not endEvent.is_set():
             try:
-                mensaje = sockEjecutivo.recv(1024).decode()
-                if mensaje == ":disconnect:":
-                    sockCliente.sendall("Sesión finalizada. Redirigiendo al menú principal...".encode())
+                mensaje_ejecutivo = sockEjecutivo.recv(1024).decode()
+                mensaje_cliente = sockCliente.recv(1024).decode()
+                if mensaje_ejecutivo == ":disconnect:":
+                    sockCliente.sendall("Sesión finalizada. Redirigiendo al menú principal...\n".encode())
                     endEvent.set()
                     break
+                if mensaje_cliente == '0':
+                    sockEjecutivo.sendall(f"{nombreCliente} se ha desconectado. Redirigiendo al menú principal...\n".encode())
+                    break
                 else:
-                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje, path_articulos, path_inventario,
+                    funcionesEjecutivo.command_parser(sockEjecutivo, mensaje_ejecutivo, path_articulos, path_inventario,
                                                     ejecutivosDisponibles, clientesConectados, clientesEsperando,
                                                     path_clientes, sockCliente, mailCliente, True)
             except Exception as e:
@@ -65,25 +76,15 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                     sockEjecutivo.sendall("Ocurrió un error inesperado, redirigiendo al menú principal...".encode())
                 except:
                     pass
-                endEvent.set()
-                break
+                finally:
+                    endEvent.set()
+                    break
     # Espera a que alguno de los dos termine para cerrar los sockets
-    def esperar_desconexion():
-        endEvent.wait()
-        try:
-            sockCliente.close()
-        except:
-            pass
-        try:
-            sockEjecutivo.close()
-        except:
-            pass
-
-    threading.Thread(target=esperar_desconexion).start()
-
     threading.Thread(target=escuchar_cliente).start()
     threading.Thread(target=escuchar_ejecutivo).start()
 
+
+    
 # Funcion de cliente
 def cliente(sock, addr):
     global clientesEsperando
