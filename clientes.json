@@ -150,6 +150,24 @@
                         "segundo": 51
                     }
                 }
+            ],
+            [
+                6,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre especial",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 7,
+                        "hora": 17,
+                        "minuto": 52,
+                        "segundo": 50
+                    },
+                    "precio": 2000,
+                    "recib": false,
+                    "dev": false
+                }
             ]
         ],
         {
