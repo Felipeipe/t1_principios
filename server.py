@@ -106,6 +106,7 @@ def cliente(sock, addr):
                                 sock.sendall("¿Se te ofrece algo más?".encode())
 
                         elif ans == "7":
+                            
                             sock.sendall("Nos vemos!".encode())
                             clientesConectados.remove(clientData)
                             sock.close()
@@ -158,10 +159,10 @@ def ejecutivo(sock,addr):
                 if passw == data[email][0]:
                     ejecutivosDisponibles.append(sock)
                     sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} clientes en línea\n".encode())
-                    if len(clientesConectados) != 0:
+                    if len(clientesEsperando) != 0:
                         sock.sendall("Si desea conectarse con el cliente, escriba el comando :connect:\n".encode())
                     else:
-                        sock.sendall("Si desea ver los clientes esperando asistencia, debe escribir :status:\n".encode())
+                        sock.sendall("Si desea ver si hay clientes esperando asistencia, debe escribir :status:\n".encode())
                     while True:
                         sock.sendall("Escribe :exit: para salir\n".encode())
                         ans = sock.recv(1024).decode()
@@ -181,9 +182,9 @@ def ejecutivo(sock,addr):
                             funcionesEjecutivo.command_parser(sock, ans, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes)
                     break
                 else:
-                    sock.sendall("Contraseña incorrecta, ingrese sus datos nuevamente.".encode())
+                    sock.sendall("Contraseña incorrecta, ingrese sus datos nuevamente.\n".encode())
             else:
-                sock.sendall("Correo no reconocido, ingrese sus datos nuevamente".encode())
+                sock.sendall("Correo no reconocido, ingrese sus datos nuevamente.\n".encode())
     except (ConnectionResetError, ConnectionAbortedError):
         try: 
             ejecutivosDisponibles.remove(sock)

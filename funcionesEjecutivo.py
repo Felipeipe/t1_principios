@@ -7,12 +7,12 @@ mutex = threading.Lock()
 
 def status(sock, onlineClients, incoming):
     with mutex:
-        sock.sendall(f"Actualmente, hay {len(onlineClients)} en línea.".encode())
+        sock.sendall(f"Actualmente, hay {len(onlineClients)} en línea.\n".encode())
         if incoming:
             for client in range(len(incoming)):
-                sock.sendall(f"Cliente {incoming[client][2]} está solicitando una conexión.".encode())
+                sock.sendall(f"Cliente {incoming[client][2]} está solicitando una conexión.\n".encode())
         else:
-            sock.sendall("Por el momento, ningún cliente ha solicitado una conexión".encode())
+            sock.sendall("Por el momento, ningún cliente ha solicitado una conexión\n".encode())
 
 def details(sock, filepathClientes, onlineClients):
     with mutex:
@@ -23,9 +23,9 @@ def details(sock, filepathClientes, onlineClients):
                 mail = onlineClients[client][1]
                 hist = data[mail][2]
                 if len(hist) == 0:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.".encode())
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.\n".encode())
                 else:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1][1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1][1]['fecha'])}".encode())
+                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1][1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1][1]['fecha'])}\n".encode())
             file.close()
 
 def catalogue(sock, filepath):
@@ -33,7 +33,7 @@ def catalogue(sock, filepath):
         with open(filepath, "r") as file:
             data = json.load(file)
             for key, values in data.items():
-                sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}".encode())
+                sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}\n".encode())
             file.close()
 
 def history(sockCliente, filepathClientes, mailCliente):
@@ -43,9 +43,9 @@ def history(sockCliente, filepathClientes, mailCliente):
             hist = data[mailCliente][2]
             for action in range(len(hist)):
                 if hist[action][1]["tipo"] == "compra" or hist[action][1]["tipo"] == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}\n".encode())
                 else:
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(hist[action][1]['tipo'])} - {hist[action][1]['nombre']} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
             file.close()
 
 def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, precio):
@@ -71,13 +71,13 @@ def buy(sockEjecutivo, filepathInventario, filepathClientes, cliente, articulo, 
                         json.dump(data2, file2, indent = 4)
                         file2.truncate()
                         file2.close()
-                        print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.")
-                        sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.".encode())
-                        cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.".encode())
+                        print(f"[SERVIDOR]: Artículo '{articulo}' fue agregado al inventario sin publicar.\n")
+                        sockEjecutivo.sendall(f"La compra de '{articulo}' se ha realizado con éxito.\n".encode())
+                        cliente[0].sendall(f"La venta de '{articulo}' se ha realizado con éxito.\n".encode())
                 else:
-                    sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.".encode()) 
+                    sockEjecutivo.sendall("El cliente no posee más unidades el artículo ingresado.\n".encode()) 
             else:
-                sockEjecutivo.sendall("El cliente no posee el artículo ingresado.".encode())       
+                sockEjecutivo.sendall("El cliente no posee el artículo ingresado.\n".encode())       
 
 def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
     """ Pone una carta a la venta por el precio del catalogo
@@ -93,7 +93,7 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
                 file1.truncate()
                 file1.close()
             else:
-                sockEjecutivo.sendall("No hay existencias de la carta ingresada.".encode())
+                sockEjecutivo.sendall("No hay existencias de la carta ingresada.\n".encode())
             with open(filepathCatalogo, "r+") as file2:
                 data2 = json.load(file2)
                 i = 0
@@ -108,8 +108,8 @@ def publish(sockEjecutivo, carta, precio, filepathCatalogo, filepathInventario):
                 json.dump(data2, file2, indent = 4)
                 file2.truncate()
                 file2.close()
-                print(f"[SERVIDOR]: Una unidad de '{carta} fue agregada al catálogo'")
-                sockEjecutivo.sendall(f"Artículo '{carta}' agregado exitosamente al catálogo.".encode())
+                print(f"[SERVIDOR]: Una unidad de '{carta} fue agregada al catálogo'\n")
+                sockEjecutivo.sendall(f"Artículo '{carta}' agregado exitosamente al catálogo.\n".encode())
 
 def insert_dict(d,val):
     """inserta en la última posicion cierto valor
@@ -143,12 +143,12 @@ def command_parser(sockEjecutivo,
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
             else:
-                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.\n".encode())
         elif instructions == ':operations:':
             if connectionStatus:
                 history(sockCliente,filepathClientes,mailCliente)
             else:
-                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.\n".encode())
         elif instructions == ':catalogue:':
             catalogue(sockEjecutivo,filepathArticulos)
         elif instructions == ':buy':
@@ -162,7 +162,7 @@ def command_parser(sockEjecutivo,
                     price = int(comm[2].removesuffix(':'))
                     buy(sockEjecutivo,filepathInventario,filepathClientes, cliente,card,price)
             else:
-                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.".encode())
+                sockEjecutivo.sendall("Esta función sólo es válida en al estar conectado con un cliente.\n".encode())
         elif instructions == ':publish':
             N = len(comm)
             card = comm[1]
@@ -172,15 +172,15 @@ def command_parser(sockEjecutivo,
                 price = int(comm[2].removesuffix(':'))
             publish(sockEjecutivo, card, price, filepathArticulos, filepathInventario)
         elif instructions == ':exit:':
-            sockEjecutivo.sendall("Nos vemos!".encode())
+            sockEjecutivo.sendall("Nos vemos\n!".encode())
             admin.remove(sockEjecutivo)
             sockEjecutivo.close()
             pass
         else:
             if connectionStatus:
-                sockCliente.sendall(f"[EJECUTIVO]: {command}".encode())
+                sockCliente.sendall(f"[EJECUTIVO]: {command}\n".encode())
             else:
-                sockEjecutivo.sendall("Ingresa un comando.".encode())
+                sockEjecutivo.sendall("Ingresa un comando.\n".encode())
        
 
 
