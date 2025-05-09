@@ -2,7 +2,22 @@
     "juanito@gmail.com": [
         "juanitateamo",
         "Juanito",
-        [],
+        [
+            [
+                1,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 17,
+                        "minuto": 2,
+                        "segundo": 44
+                    }
+                }
+            ]
+        ],
         {}
     ],
     "bender@ug.uchile.cl": [
