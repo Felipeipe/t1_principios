@@ -66,8 +66,11 @@ mutex = threading.Lock()
 def cambioContraseña(sock:socket.socket, filepath:str, mail: str): 
     """Cambiar la contraseña actual de un usuario"""
     while True:
-        sock.sendall("Ingrese su contraseña actual: \n".encode())
+        sock.sendall("Ingrese su contraseña actual. Si no desea cambiar su contraseña escriba :cancel: \n".encode())
         act = sock.recv(1024).decode()
+        if act == ':cancel:':
+            sock.sendall("Volviendo al menú principal...\n".encode())
+            break
         with mutex:
             with open(filepath, "r+") as file: # se abre el archivo asociado a los clientes
                 data = json.load(file)
@@ -75,8 +78,14 @@ def cambioContraseña(sock:socket.socket, filepath:str, mail: str):
                     while True:
                         sock.sendall("Ingrese su nueva contraseña: \n".encode()) 
                         new = sock.recv(1024).decode() # se recibe la contraseña nueva
+                        if new == ':cancel:':
+                            sock.sendall("Volviendo al menú principal...\n".encode())
+                            break
                         sock.sendall("Repita su nueva contraseña: \n".encode())
                         newRep = sock.recv(1024).decode() # se recibe una confirmación de la contraseña nueva
+                        if newRep == ':cancel:':
+                            sock.sendall("Volviendo al menú principal...\n".encode())
+                            break
                         if new == newRep: # si las contraseñas coinciden...
                             data[mail][0] = new # se setea la contraseña ingresada cómo la nueva contraseña
                             data[mail][2].append([len(data[mail][2]) + 1, accion("cambio").asdict()]) # se guarda la acción en el historial
