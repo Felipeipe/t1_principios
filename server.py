@@ -26,15 +26,13 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
     connectEvent = cliente[3]
     endEvent = cliente[4]
 
-    print("se llega hasta esta parte")
     connectEvent.set()
-    print("se llega hasta esta parte")
 
     def escuchar_cliente():
         while not endEvent.is_set():
             try:
                 mensaje = sockCliente.recv(1024).decode()
-                if mensaje == "0":
+                if mensaje == ":disconnect:":
                     sockEjecutivo.send(f"{nombreCliente} ha salido del chat.\n".encode())
                     endEvent.set()
                     break
@@ -104,7 +102,8 @@ def cliente(sock, addr):
                             sock.sendall("Esperando a que se conecte un ejecutivo...\n".encode())
                             if connectEvent.wait(timeout = 15):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...\n".encode())
-                                sock.sendall("Sesión iniciada! Recuerda mantener el respeto en todo momento.".encode())
+                                sock.sendall("Sesión iniciada! Recuerda mantener el respeto en todo momento.\n".encode())
+                                sock.sendall("Si desea desconectarse por favor escriba :disconnect:".encode())
                                 endEvent.wait()
                                 with mutex:
                                     with open(path_clientes, "r+") as file:
