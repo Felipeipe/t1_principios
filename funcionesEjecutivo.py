@@ -44,9 +44,9 @@ def history(sockCliente, filepathClientes, mailCliente):
             for action in range(len(hist)):
                 type = hist[action][1]["tipo"]
                 if type == "compra" or type == "venta":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}\n".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace('_', ' ')} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])} - Precio de compra / venta: {hist[action][1]['precio']}\n".encode())
                 elif type == "recib" or type == "devo":
-                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace("_", " ")} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
+                    sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - {hist[action][1]['nombre'].replace('_', ' ')} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
                 else:
                     sockCliente.sendall(f"[{hist[action][0]}] {funcionesCliente.translate(type)} - Fecha: {funcionesCliente.dicttoDate(hist[action][1]['fecha'])}\n".encode())
             file.close()

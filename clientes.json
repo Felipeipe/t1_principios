@@ -203,7 +203,7 @@
         }
     ],
     "thamar.contreras@ug.uchile.cl": [
-        "aloha",
+        "mandarina",
         "Thamar",
         [
             [
@@ -303,6 +303,20 @@
                     "precio": 2000,
                     "recib": false,
                     "devo": false
+                }
+            ],
+            [
+                7,
+                {
+                    "tipo": "cambio",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 14,
+                        "minuto": 56,
+                        "segundo": 34
+                    }
                 }
             ]
         ],
