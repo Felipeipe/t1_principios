@@ -162,7 +162,7 @@ def verHistorial(sock:socket.socket, filepath, mail):
                     ans = sock.recv(1024).decode()
                     if ans == "0":
                         break
-                    elif ans.isnumeric() and 0 < int(ans) < n + 1: 
+                    elif ans.isnumeric() and 0 < int(ans) < n: 
                         ans = int(ans)
                         sock.sendall("Datos:\n".encode())
                         sock.sendall(f"Tipo - {translate(transactions[ans - 1]['tipo'])}\n".encode())                   
@@ -198,7 +198,7 @@ def confirmarEnvio(sock:socket.socket, filepath, mail):
                     ans = sock.recv(1024).decode()
                     if ans  == "0":
                         break
-                    elif ans.isnumeric() and 0 < int(ans) < n + 1:
+                    elif ans.isnumeric() and 0 < int(ans) < n:
                         ans = int(ans)
                         sock.sendall(f"¿Deseas confirmar que el envío de '{transactions[ans - 1][1]['nombre'].replace('_', ' ')}' se concretó de forma exitosa? (1 = Aceptar - 0 = Cancelar)\n".encode())
                         resp = sock.recv(1024).decode()
@@ -248,7 +248,7 @@ def tramitarDevolucion(sock:socket.socket, filepath, mail):
                     ans = sock.recv(1024).decode()
                     if ans == "0":
                         break
-                    elif ans.isnumeric() and 0 < int(ans) < n + 1:
+                    elif ans.isnumeric() and 0 < int(ans) < n:
                         ans = int(ans)
                         sock.sendall(f"¿Deseas confirmar el reembolso de {transactions[ans - 1][1]['nombre'].replace('_', ' ')}? (1 = Aceptar - 0 = Cancelar)\n".encode())
                         resp = sock.recv(1024).decode()

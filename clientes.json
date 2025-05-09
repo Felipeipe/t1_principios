@@ -209,119 +209,55 @@
             [
                 1,
                 {
-                    "tipo": "cambio",
-                    "nombre": "a",
+                    "tipo": "compra",
+                    "nombre": "Sobre_especial",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
-                        "dia": 7,
+                        "dia": 9,
                         "hora": 16,
-                        "minuto": 40,
-                        "segundo": 33
-                    }
+                        "minuto": 38,
+                        "segundo": 42
+                    },
+                    "precio": 2000,
+                    "recib": true,
+                    "devo": false
                 }
             ],
             [
                 2,
                 {
-                    "tipo": "compra",
-                    "nombre": "Sobre_comun",
+                    "tipo": "confirm",
+                    "nombre": "Sobre_especial (Comprado el 2025-05-09 16:38:42)",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
-                        "dia": 7,
+                        "dia": 9,
                         "hora": 16,
-                        "minuto": 53,
-                        "segundo": 34
+                        "minuto": 38,
+                        "segundo": 10
                     },
-                    "precio": 1000,
-                    "recib": true,
                     "devo": true
                 }
             ],
             [
                 3,
                 {
-                    "tipo": "compra",
-                    "nombre": "Sobre_epico",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 7,
-                        "hora": 16,
-                        "minuto": 56,
-                        "segundo": 6
-                    },
-                    "precio": 4000,
-                    "recib": true,
-                    "devo": false
-                }
-            ],
-            [
-                4,
-                {
-                    "tipo": "confirm",
-                    "nombre": "Sobre_comun (Comprado el 2025-05-07 16:53:34)",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 7,
-                        "hora": 16,
-                        "minuto": 59,
-                        "segundo": 51
-                    }
-                }
-            ],
-            [
-                5,
-                {
                     "tipo": "devo",
-                    "nombre": "Sobre_comun (Comprado el 2025-05-07 16:53:34)",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 7,
-                        "hora": 16,
-                        "minuto": 59,
-                        "segundo": 51
-                    }
-                }
-            ],
-            [
-                6,
-                {
-                    "tipo": "compra",
-                    "nombre": "Sobre_especial",
-                    "fecha": {
-                        "a\u00f1o": 2025,
-                        "mes": 5,
-                        "dia": 7,
-                        "hora": 17,
-                        "minuto": 52,
-                        "segundo": 50
-                    },
-                    "precio": 2000,
-                    "recib": false,
-                    "devo": false
-                }
-            ],
-            [
-                7,
-                {
-                    "tipo": "cambio",
+                    "nombre": "Sobre_especial (Comprado el 2025-05-09 16:38:42)",
                     "fecha": {
                         "a\u00f1o": 2025,
                         "mes": 5,
                         "dia": 9,
-                        "hora": 14,
-                        "minuto": 56,
-                        "segundo": 34
+                        "hora": 16,
+                        "minuto": 38,
+                        "segundo": 10
                     }
                 }
             ]
         ],
         {
-            "Sobre_comun": 1
+            "Sobre_especial": 0
         }
     ],
     "fernanda.borja@ug.uchile.cl": [
