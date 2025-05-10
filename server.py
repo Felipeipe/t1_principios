@@ -35,14 +35,12 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 mensaje = sockCliente.recv(1024).decode()
                 if mensaje == ":disconnect:":
                     sockEjecutivo.send(f"{nombreCliente} ha salido del chat.\n".encode())
-                    with mutex:
-                        endEvent.set()
+                    endEvent.set()
                     break
                 sockEjecutivo.send(f"[{nombreCliente}] {mensaje}".encode())
             except Exception as e:
                 print(f'[SERVER]: error cliente: {e}')
-                with mutex:
-                    endEvent.set()
+                endEvent.set()
                 break
 
     def escuchar_ejecutivo():
@@ -51,8 +49,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 mensaje = sockEjecutivo.recv(1024).decode()
                 if mensaje == ":disconnect:":
                     sockCliente.send("Ejecutivo ha salido del chat.\n".encode())
-                    with mutex:
-                        endEvent.set()
+                    endEvent.set()
                     break
                 funcionesEjecutivo.command_parser(
                     sockEjecutivo, mensaje, path_articulos, path_inventario,
@@ -61,8 +58,7 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                 )
             except Exception as e:
                 print(f'[SERVER]: error ejecutivo: {e}')
-                with mutex:
-                    endEvent.set()
+                endEvent.set()
                 break
 
     threading.Thread(target=escuchar_cliente).start()
@@ -229,7 +225,7 @@ def ejecutivo(sock,addr):
 
 if __name__ == "__main__":
     # Se configura el servidor para que corra localmente y en el puerto 8889.
-    ip = '127.0.0.1'
+    ip = '0.0.0.0'
     puerto = 8889
 
     # Se crea el socket y se instancia en las variables anteriores.
@@ -264,3 +260,4 @@ if __name__ == "__main__":
         else:
             print(tipo_usuario)
             break
+
