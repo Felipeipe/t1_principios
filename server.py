@@ -20,14 +20,14 @@ mutex = threading.Lock() # Este impone el mutex
 def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_clientes):
     global clientesEsperando, ejecutivosDisponibles, clientesConectados
 
-    with mutex:
-        sockCliente = cliente[0]
-        mailCliente = cliente[1]
-        nombreCliente = cliente[2]
-        connectEvent = cliente[3]
-        endEvent = cliente[4]
+    
+    sockCliente = cliente[0]
+    mailCliente = cliente[1]
+    nombreCliente = cliente[2]
+    connectEvent = cliente[3]
+    endEvent = cliente[4]
 
-        connectEvent.set()
+    connectEvent.set()
 
     def escuchar_cliente():
         while not endEvent.is_set():
@@ -199,8 +199,8 @@ def ejecutivo(sock,addr):
                                     cliente = clientesEsperando.pop(0)
                                 iniciar_chat(cliente, sock, path_articulos, path_inventario, path_clientes)
                                 sock.sendall("Conexión con cliente exitosa, puede comenzar a chatear\n".encode())
-                                with mutex:
-                                    cliente[4].wait()
+                                
+                                cliente[4].wait()
                         else:
                             funcionesEjecutivo.command_parser(sock, ans, path_articulos, path_inventario, ejecutivosDisponibles, clientesConectados, clientesEsperando, path_clientes)
                     break
@@ -251,12 +251,14 @@ if __name__ == "__main__":
         if tipo_usuario == b"Cliente":
             client_thread = threading.Thread(target=cliente, args=(conn, addr))
             client_thread.start()
+            print(f'Hilos Vivos: {threading.enumerate()}')
             print(f"ID Cliente conectado desde {addr}")
 
         elif tipo_usuario == b"Ejecutivo":
             print(f"ID Ejecutivo conectado desde {addr}")
             ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
             ejecutivo_thread.start()
+            print(f'Hilos Vivos: {threading.enumerate()}')
         else:
             print(tipo_usuario)
             break
