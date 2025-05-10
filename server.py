@@ -72,7 +72,7 @@ def cliente(sock, addr):
     global clientesConectados
     try:
         
-        sock.sendall("Para iniciar sesión, ingresa tu correo y contraseña".encode())
+        sock.sendall("\nPara iniciar sesión, ingresa tu correo y contraseña\n".encode())
         while True:
             # Revisamos que usuarios disponibles tenemos
             with mutex:
@@ -83,10 +83,10 @@ def cliente(sock, addr):
             sock.sendall("Ingresa tu correo: ".encode())
             email = sock.recv(1024).decode()
             if email in clientes:
-                sock.sendall("Ingresa tu contraseña: ".encode())
+                sock.sendall("\nIngresa tu contraseña: ".encode())
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
-                    sock.sendall(f"Hola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
+                    sock.sendall(f"\nHola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
                         clientData = [sock, email, data[email][1]]
                         clientesConectados.append(clientData)
@@ -153,7 +153,7 @@ def ejecutivo(sock,addr):
     global clientesEsperando
 
     try:
-        sock.sendall("Para iniciar sesión, ingresa tu correo y contraseña".encode())
+        sock.sendall("\nPara iniciar sesión, ingresa tu correo y contraseña\n".encode())
         while True:
             # Revisamos que usuarios disponibles tenemos
             with mutex:
@@ -161,10 +161,10 @@ def ejecutivo(sock,addr):
                     data = json.load(file)
                     ejecutivos = list(data.keys())
                     file.close()
-                    sock.sendall("Ingresa tu correo: ".encode())
-                    email = sock.recv(1024).decode()
+                sock.sendall("Ingresa tu correo: ".encode())
+                email = sock.recv(1024).decode()
             if email in ejecutivos:
-                sock.sendall("Ingresa tu contraseña: ".encode())
+                sock.sendall("\nIngresa tu contraseña: ".encode())
                 passw = sock.recv(1024).decode()
                 if passw == data[email][0]:
                     ejecutivosDisponibles.append(sock)
