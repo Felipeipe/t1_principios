@@ -102,7 +102,7 @@ def cliente(sock, addr):
                             dataChat = [sock, email, data[email][1], connectEvent, endEvent]
                             clientesEsperando.append(dataChat)
                             sock.sendall("Esperando a que se conecte un ejecutivo...\n".encode())
-                            if connectEvent.wait(timeout = 15):
+                            if connectEvent.wait(timeout = 60):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...\n".encode())
                                 sock.sendall("Sesión iniciada! Recuerda mantener el respeto en todo momento.".encode())
                                 endEvent.wait()
