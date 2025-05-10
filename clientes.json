@@ -269,6 +269,20 @@
                         "segundo": 10
                     }
                 }
+            ],
+            [
+                4,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 20,
+                        "minuto": 1,
+                        "segundo": 19
+                    }
+                }
             ]
         ],
         {
