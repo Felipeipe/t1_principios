@@ -100,7 +100,7 @@ def cliente(sock, addr):
                             dataChat = [sock, email, data[email][1], connectEvent, endEvent]
                             clientesEsperando.append(dataChat)
                             sock.sendall("Esperando a que se conecte un ejecutivo...\n".encode())
-                            if connectEvent.wait(timeout = 15):
+                            if connectEvent.wait(timeout = 60):
                                 sock.sendall("Conexión establecida con un ejecutivo. Redirigiendo...\n".encode())
                                 sock.sendall("Sesión iniciada! Recuerda mantener el respeto en todo momento.\n".encode())
                                 sock.sendall("Si desea desconectarse por favor escriba :disconnect:".encode())
@@ -116,10 +116,15 @@ def cliente(sock, addr):
                                 sock.sendall("No hay ningún ejecutivo disponible en estos momentos. Intenta nuevamente más tarde.\n".encode())
 
                             sock.sendall("¿Se te ofrece algo más?".encode())
-                        elif ans == "7":                            
-                            sock.sendall("Nos vemos!".encode())
-                            clientesConectados.remove(clientData)
-                            sock.close()
+                        elif ans == "7":
+                            try:
+                                print("hola")                            
+                                sock.sendall("Nos vemos!".encode())
+                                print("hola")
+                                clientesConectados.remove(clientData)
+                                sock.close()
+                            except Exception as e:
+                                print(f"Error inesperado: {e}")
                             break
                         else:
                             funcionesCliente.determinarAccion(sock, ans, path_clientes, path_articulos, email)
@@ -132,6 +137,7 @@ def cliente(sock, addr):
     except (ConnectionResetError, ConnectionAbortedError):
         try:
             clientesConectados.remove(clientData)
+            print("pucha")
         except ValueError:
             pass
         
