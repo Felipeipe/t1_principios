@@ -225,7 +225,7 @@ def ejecutivo(sock,addr):
 
 if __name__ == "__main__":
     # Se configura el servidor para que corra localmente y en el puerto 8889.
-    ip = '0.0.0.0'
+    ip = '127.0.0.1'
     puerto = 8889
 
     # Se crea el socket y se instancia en las variables anteriores.
@@ -251,14 +251,12 @@ if __name__ == "__main__":
         if tipo_usuario == b"Cliente":
             client_thread = threading.Thread(target=cliente, args=(conn, addr))
             client_thread.start()
-            print(f'Hilos Vivos: {threading.enumerate()}')
             print(f"ID Cliente conectado desde {addr}")
 
         elif tipo_usuario == b"Ejecutivo":
             print(f"ID Ejecutivo conectado desde {addr}")
             ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
             ejecutivo_thread.start()
-            print(f'Hilos Vivos: {threading.enumerate()}')
         else:
             print(tipo_usuario)
             break
