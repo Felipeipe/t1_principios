@@ -113,8 +113,6 @@ def cliente(sock, addr):
                                         file.seek(0)
                                         json.dump(histData, file, indent = 4)
                             else:
-                                with mutex:
-                                    clientesEsperando.remove(dataChat)
                                 sock.sendall("No hay ningún ejecutivo disponible en estos momentos. Intenta nuevamente más tarde.\n".encode())
 
                             sock.sendall("¿Se te ofrece algo más?".encode())
