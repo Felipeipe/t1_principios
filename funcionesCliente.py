@@ -94,7 +94,6 @@ def cambioContraseña(sock:socket.socket, filepath:str, mail: str):
                             file.seek(0)
                             json.dump(data, file, indent = 4)
                             file.truncate()
-                            file.close()
                             sock.sendall("Contraseña cambiada con éxito!\n".encode())
                             print(f"[SERVIDOR]: Cambio de clave - Cliente {data[mail][1]}\n")
                             break

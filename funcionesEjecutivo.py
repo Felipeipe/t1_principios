@@ -19,22 +19,20 @@ def details(sock, filepathClientes, onlineClients):
         n = len(onlineClients)
         with open(filepathClientes, "r") as file:
             data = json.load(file)
-            for client in range(n):
-                mail = onlineClients[client][1]
-                hist = data[mail][2]
-                if len(hist) == 0:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.\n".encode())
-                else:
-                    sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1][1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1][1]['fecha'])}\n".encode())
-            file.close()
+        for client in range(n):
+            mail = onlineClients[client][1]
+            hist = data[mail][2]
+            if len(hist) == 0:
+                sock.sendall(f"Cliente {onlineClients[client][2]} - El cliente aún no ha realizado alguna acción.\n".encode())
+            else:
+                sock.sendall(f"Cliente {onlineClients[client][2]} - Última acción: {funcionesCliente.translate(hist[-1][1]['tipo'])}, con fecha {funcionesCliente.dicttoDate(hist[-1][1]['fecha'])}\n".encode())
 
 def catalogue(sock, filepath):
     with mutex:
         with open(filepath, "r") as file:
             data = json.load(file)
-            for key, values in data.items():
-                sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}\n".encode())
-            file.close()
+        for key, values in data.items():
+            sock.sendall(f"[{key}] {values[0]} - Precio: {values[1]} - Stock {values[2]}\n".encode())
 
 def history(sockCliente, filepathClientes, mailCliente):
     with mutex:
