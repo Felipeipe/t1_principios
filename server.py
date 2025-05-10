@@ -93,8 +93,7 @@ def cliente(sock, addr):
                     sock.sendall(f"\nHola, {data[email][1]}! ¿En qué te podemos ayudar hoy? (Ingresa un número)".encode())
                     with mutex:
                         clientData = [sock, email, data[email][1]]
-                        with mutex:
-                            clientesConectados.append(clientData)
+                        clientesConectados.append(clientData)
 
                     while True:
                         sock.sendall("[1] Cambiar contraseña\n[2] Ver el catálogo de productos\n[3] Ver el historial de compras\n[4] Confirmar envíos\n[5] Solicitar la devolución de un artículo\n[6] Chat con ejecutivo\n[7] Cerrar sesión".encode())
