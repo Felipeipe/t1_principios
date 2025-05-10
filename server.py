@@ -138,13 +138,13 @@ def cliente(sock, addr):
             with mutex:
                 clientesConectados.remove(clientData)
             print("pucha")
-        except ValueError:
+        except (ValueError, UnboundLocalError):
             pass
         
         try:
             with mutex:
                 clientesEsperando.remove(clientData)
-        except ValueError:
+        except (ValueError, UnboundLocalError):
             pass
 
         print(f"[SERVIDOR] Cliente {addr} se desconectó abruptamente.")

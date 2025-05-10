@@ -21,7 +21,7 @@
         {}
     ],
     "bender@ug.uchile.cl": [
-        "tiaturbina",
+        "tiaturbina1",
         "Bender",
         [
             [
@@ -145,6 +145,62 @@
                         "segundo": 15
                     }
                 }
+            ],
+            [
+                9,
+                {
+                    "tipo": "cambio",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                10,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                11,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 23,
+                        "minuto": 4,
+                        "segundo": 38
+                    }
+                }
+            ],
+            [
+                12,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 23,
+                        "minuto": 4,
+                        "segundo": 38
+                    }
+                }
             ]
         ],
         {
@@ -158,7 +214,7 @@
         {}
     ],
     "fernando.munoz.o@ug.uchile.cl": [
-        "contra1",
+        "contra",
         "Fernando",
         [
             [
@@ -209,12 +265,172 @@
                     },
                     "precio": 1500
                 }
+            ],
+            [
+                4,
+                {
+                    "tipo": "cambio",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                5,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_comun",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 37,
+                        "segundo": 0
+                    },
+                    "precio": 1000,
+                    "recib": false,
+                    "devo": false
+                }
+            ],
+            [
+                6,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                7,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                8,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                9,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                10,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                11,
+                {
+                    "tipo": "venta",
+                    "nombre": "Sobre_legendario",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 56,
+                        "segundo": 26
+                    },
+                    "precio": 1000
+                }
+            ],
+            [
+                12,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 51,
+                        "segundo": 45
+                    }
+                }
+            ],
+            [
+                13,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 51,
+                        "segundo": 45
+                    }
+                }
+            ],
+            [
+                14,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 51,
+                        "segundo": 45
+                    }
+                }
             ]
         ],
         {
             "Sobre_epico": 2,
             "Sobre_especial": 0,
-            "Sobre_legendario": 1
+            "Sobre_legendario": 0
         }
     ],
     "thamar.contreras@ug.uchile.cl": [
@@ -283,10 +499,177 @@
                         "segundo": 19
                     }
                 }
+            ],
+            [
+                5,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                6,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_legendario",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 37,
+                        "segundo": 46
+                    },
+                    "precio": 10000,
+                    "recib": true,
+                    "devo": false
+                }
+            ],
+            [
+                7,
+                {
+                    "tipo": "confirm",
+                    "nombre": "Sobre_legendario (Comprado el 2025-05-09 22:37:46)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                8,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                9,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre_especial (Comprado el 2025-05-09 16:38:42)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                10,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_epico",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 38,
+                        "segundo": 26
+                    },
+                    "precio": 4000,
+                    "recib": false,
+                    "devo": false
+                }
+            ],
+            [
+                11,
+                {
+                    "tipo": "venta",
+                    "nombre": "Sobre_legendario",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 41,
+                        "segundo": 22
+                    },
+                    "precio": 5000
+                }
+            ],
+            [
+                12,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                13,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 22,
+                        "minuto": 36,
+                        "segundo": 22
+                    }
+                }
+            ],
+            [
+                14,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 23,
+                        "minuto": 4,
+                        "segundo": 38
+                    }
+                }
+            ],
+            [
+                15,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 23,
+                        "minuto": 4,
+                        "segundo": 38
+                    }
+                }
             ]
         ],
         {
-            "Sobre_especial": 0
+            "Sobre_especial": -1,
+            "Sobre_legendario": 0
         }
     ],
     "fernanda.borja@ug.uchile.cl": [
