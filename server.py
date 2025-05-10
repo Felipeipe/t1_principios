@@ -251,7 +251,9 @@ if __name__ == "__main__":
 
         # Se inicia el thread del cliente o ejecutivo
         if tipo_usuario == b"Cliente":
-            if len(clientesConectados) < 7:
+            with mutex:
+                num_clientes = len(clientesConectados)
+            if num_clientes < 7:
                 client_thread = threading.Thread(target=cliente, args=(conn, addr))
                 client_thread.start()
                 print(f"ID Cliente conectado desde {addr}")
@@ -259,7 +261,9 @@ if __name__ == "__main__":
                 conn.send("Lo siento! Se ha alcanzado el límite de clientes conectados. \nPor favor, intente más tarde\n".encode())
 
         elif tipo_usuario == b"Ejecutivo":
-            if len(ejecutivosDisponibles) < 3:
+            with mutex:
+                num_ejecutivos = len(ejecutivosDisponibles)
+            if num_ejecutivos < 3:
                 print(f"ID Ejecutivo conectado desde {addr}")
                 ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
                 ejecutivo_thread.start()
