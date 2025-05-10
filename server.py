@@ -171,7 +171,7 @@ def ejecutivo(sock,addr):
                     
                     sock.sendall(f"Hola, {data[email][1]}! Actualmente, hay {len(clientesConectados)} cliente(s) en línea.\n".encode())
                     if len(clientesEsperando) != 0:
-                        sock.sendall(f"Hay {len(clientesEsperando)} cliente(s) solicitando asistencia. Si desea conectarse con establecer una conexión con alguno, escriba el comando :connect:\n".encode())
+                        sock.sendall(f"Hay {len(clientesEsperando)} cliente(s) solicitando asistencia. Si desea establecer una conexión con alguno, escriba el comando :connect:\n".encode())
                     else:
                         sock.sendall("Para comenzar, ingresa un comando.\n".encode())
                     while True:
