@@ -296,9 +296,106 @@
         {}
     ],
     "ariel.nunez@ug.uchile.cl": [
-        "fandesistemasdigitales",
+        "digitales1",
         "Ariel",
-        [],
-        {}
+        [
+            [
+                1,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_epico",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 19,
+                        "minuto": 58,
+                        "segundo": 25
+                    },
+                    "precio": 4000,
+                    "recib": true,
+                    "devo": true
+                }
+            ],
+            [
+                2,
+                {
+                    "tipo": "compra",
+                    "nombre": "Sobre_legendario",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 19,
+                        "minuto": 58,
+                        "segundo": 49
+                    },
+                    "precio": 10000,
+                    "recib": false,
+                    "devo": false
+                }
+            ],
+            [
+                3,
+                {
+                    "tipo": "cambio",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 20,
+                        "minuto": 27,
+                        "segundo": 12
+                    }
+                }
+            ],
+            [
+                4,
+                {
+                    "tipo": "hist",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 20,
+                        "minuto": 27,
+                        "segundo": 12
+                    }
+                }
+            ],
+            [
+                5,
+                {
+                    "tipo": "confirm",
+                    "nombre": "Sobre_epico (Comprado el 2025-05-09 19:58:25)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 20,
+                        "minuto": 27,
+                        "segundo": 12
+                    }
+                }
+            ],
+            [
+                6,
+                {
+                    "tipo": "devo",
+                    "nombre": "Sobre_epico (Comprado el 2025-05-09 19:58:25)",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 9,
+                        "hora": 20,
+                        "minuto": 27,
+                        "segundo": 12
+                    }
+                }
+            ]
+        ],
+        {
+            "Sobre_epico": 0
+        }
     ]
 }
