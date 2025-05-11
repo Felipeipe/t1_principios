@@ -16,6 +16,34 @@
                         "segundo": 44
                     }
                 }
+            ],
+            [
+                2,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 11,
+                        "hora": 17,
+                        "minuto": 29,
+                        "segundo": 28
+                    }
+                }
+            ],
+            [
+                3,
+                {
+                    "tipo": "exec",
+                    "fecha": {
+                        "a\u00f1o": 2025,
+                        "mes": 5,
+                        "dia": 11,
+                        "hora": 17,
+                        "minuto": 55,
+                        "segundo": 15
+                    }
+                }
             ]
         ],
         {}
