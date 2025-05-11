@@ -6,12 +6,16 @@ def leer(sock):
     while True:
         try:
             res = sock.recv(1024).decode()
+            if not res:
+                print("Servidor cerró la conexión.")
+                break
         except:
             sock.close()
             break
         print(res)
         if res == 'No te cacho :/': break
-    return None
+    return None  
+
 
 # Se asume que el servidor esta corriendo localmente en el puerto 8889.
 HOST = '127.0.0.1'

@@ -268,6 +268,8 @@ if __name__ == "__main__":
                 print(f"ID Cliente conectado desde {addr}")
             else:
                 conn.send("Lo siento! Se ha alcanzado el límite de clientes conectados. \nPor favor, intente más tarde\n".encode())
+                conn.close()
+                continue
 
         elif tipo_usuario == b"Ejecutivo":
             with mutex:
@@ -280,6 +282,8 @@ if __name__ == "__main__":
                 ejecutivo_thread.start()
             else:
                 conn.send("Lo siento! Se ha alcanzado el límite de ejecutivos conectados. \nPor favor, intente más tarde\n".encode())
+                conn.close()
+                continue
         else:
             print(tipo_usuario)
             break
