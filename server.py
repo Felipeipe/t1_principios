@@ -12,9 +12,11 @@ path_articulos = "articulos.json"
 path_ejecutivos = "ejecutivos.json"
 path_inventario = "inventario_sinPublicar.json"
 
-clientesEsperando= []
+clientesEsperando = []
 ejecutivosDisponibles = []
-clientesConectados=[]
+clientesConectados = []
+incoming_clients = []
+incoming_executives = []
 mutex = threading.Lock() # Este impone el mutex
 
 def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_clientes):
@@ -123,6 +125,7 @@ def cliente(sock, addr):
                                 sock.sendall("Nos vemos!".encode())
                                 with mutex:
                                     clientesConectados.remove(clientData)
+                                    incoming_clients.remove(sock)
                                 sock.close()
                             except Exception as e:
                                 print(f"Error inesperado: {e}")
@@ -137,18 +140,20 @@ def cliente(sock, addr):
                 sock.sendall("Correo no reconocido, ingrese sus datos nuevamente".encode())
     except (ConnectionResetError, ConnectionAbortedError):
         try:
-            with mutex:
-                clientesConectados.remove(clientData)
-            print("pucha")
-        except (ValueError, UnboundLocalError):
+            if clientData in clientesConectados:
+                with mutex:
+                    clientesConectados.remove(clientData)
+        except UnboundLocalError:
             pass
-        
         try:
-            with mutex:
-                clientesEsperando.remove(clientData)
-        except (ValueError, UnboundLocalError):
+            if clientData in clientesEsperando:
+                with mutex:
+                    clientesEsperando.remove(clientData)
+        except UnboundLocalError:
             pass
-
+        if sock in incoming_clients:
+            with mutex:
+                incoming_executives.remove(sock)
         print(f"[SERVIDOR] Cliente {addr} se desconectó abruptamente.")
     except Exception as e:
         print(f"[SERVIDOR] Error inesperado con {addr}: {e}")
@@ -211,10 +216,12 @@ def ejecutivo(sock,addr):
             else:
                 sock.sendall("Correo no reconocido, ingrese sus datos nuevamente.\n".encode())
     except (ConnectionResetError, ConnectionAbortedError):
-        try: 
-            ejecutivosDisponibles.remove(sock)
-        except ValueError:
-            pass
+        if sock in ejecutivosDisponibles:
+            with mutex:
+                ejecutivosDisponibles.remove(sock)
+        if sock in incoming_executives:
+            with mutex:
+                incoming_executives.remove(sock)
 
         print(f"[SERVIDOR] Ejecutivo {addr} se desconectó abruptamente.")
     except Exception as e:
@@ -246,20 +253,35 @@ if __name__ == "__main__":
 
         # Se recibe el tipo de usuario, para determinar colas de prioridad
         tipo_usuario = conn.recv(1024)
-        conn.send("Bienvenid@ a la plataforma de atención al cliente de TCG5!".encode())
+        conn.send("Bienvenid@ a la plataforma de atención al cliente de TCG5!\n".encode())
         
 
         # Se inicia el thread del cliente o ejecutivo
         if tipo_usuario == b"Cliente":
-            client_thread = threading.Thread(target=cliente, args=(conn, addr))
-            client_thread.start()
-            print(f"ID Cliente conectado desde {addr}")
+            with mutex:
+                num_incoming_clients = len(incoming_clients)
+            if num_incoming_clients < 7:
+                with mutex:
+                    incoming_clients.append(conn)
+                client_thread = threading.Thread(target=cliente, args=(conn, addr))
+                client_thread.start()
+                print(f"ID Cliente conectado desde {addr}")
+            else:
+                conn.send("Lo siento! Se ha alcanzado el límite de clientes conectados. \nPor favor, intente más tarde\n".encode())
 
         elif tipo_usuario == b"Ejecutivo":
-            print(f"ID Ejecutivo conectado desde {addr}")
-            ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
-            ejecutivo_thread.start()
+            with mutex:
+                num_incoming_exec = len(incoming_executives)
+            if num_incoming_exec < 3:
+                with mutex:
+                    incoming_executives.append(conn)
+                print(f"ID Ejecutivo conectado desde {addr}")
+                ejecutivo_thread = threading.Thread(target=ejecutivo, args=(conn, addr))
+                ejecutivo_thread.start()
+            else:
+                conn.send("Lo siento! Se ha alcanzado el límite de ejecutivos conectados. \nPor favor, intente más tarde\n".encode())
         else:
             print(tipo_usuario)
             break
+
 
