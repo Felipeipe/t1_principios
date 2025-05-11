@@ -39,7 +39,11 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                     break
                 sockEjecutivo.send(f"[{nombreCliente}] {mensaje}".encode())
             except Exception as e:
-                print(f'[SERVER]: error cliente: {e}')
+                print(f'[SERVER]: error inesperado: {e}')
+                try:
+                    sockCliente.sendall('Ocurrió un error inesperado, volviendo al menú principal...'.encode())
+                except:
+                    pass
                 endEvent.set()
                 break
 
@@ -57,7 +61,11 @@ def iniciar_chat(cliente, sockEjecutivo, path_articulos, path_inventario, path_c
                     path_clientes, sockCliente, mailCliente, True
                 )
             except Exception as e:
-                print(f'[SERVER]: error ejecutivo: {e}')
+                print(f'[SERVER]: error inesperado: {e}')
+                try:
+                    sockEjecutivo.sendall('Ocurrió un error inesperado, volviendo al menú principal...'.encode())
+                except:
+                    pass
                 endEvent.set()
                 break
 
